@@ -1104,6 +1104,9 @@ def generateClassDirs(Collection projects) {
     }
 }
 
+zipProject {
+    excludeFromZip = ['out']
+}
 
 task aggregateJavadoc(type: Javadoc,
         description: 'Generate javadocs from all child projects as if it was a single project',

@@ -19,7 +19,7 @@ package com.haulmont.cuba.web.toolkit.ui.client.passwordfield;
 
 import com.vaadin.shared.Connector;
 import com.vaadin.shared.annotations.NoLayout;
-import com.vaadin.shared.ui.textfield.AbstractTextFieldState;
+import com.vaadin.v7.shared.ui.textfield.AbstractTextFieldState;
 
 public class CubaPasswordFieldState extends AbstractTextFieldState {
 

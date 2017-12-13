@@ -27,10 +27,10 @@ import com.haulmont.cuba.web.gui.data.PropertyWrapper;
 import com.haulmont.cuba.web.gui.icons.IconResolver;
 import com.haulmont.cuba.web.toolkit.ui.CubaTwinColSelect;
 import com.haulmont.cuba.web.toolkit.ui.converters.ObjectToObjectConverter;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.converter.Converter;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.converter.Converter;
 import com.vaadin.server.Resource;
-import com.vaadin.ui.AbstractSelect;
+import com.vaadin.v7.ui.AbstractSelect;
 
 import java.util.*;
 
@@ -73,7 +73,6 @@ public class WebTwinColumn extends WebAbstractOptionsField<CubaTwinColSelect> im
             }
         };
         attachListener(component);
-        component.setImmediate(true);
         component.setItemCaptionMode(AbstractSelect.ItemCaptionMode.ITEM);
         component.setMultiSelect(true);
         component.setInvalidAllowed(false);

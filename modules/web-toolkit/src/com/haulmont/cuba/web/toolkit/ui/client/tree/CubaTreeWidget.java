@@ -22,20 +22,17 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.ContextMenuEvent;
 import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.haulmont.cuba.web.toolkit.ui.client.Tools;
 import com.vaadin.client.BrowserInfo;
 import com.vaadin.client.ConnectorMap;
 import com.vaadin.client.ui.ShortcutActionHandler;
 import com.vaadin.client.ui.VOverlay;
-import com.vaadin.client.ui.VTree;
+import com.vaadin.v7.client.ui.VTree;
 
 public class CubaTreeWidget extends VTree implements ShortcutActionHandler.ShortcutActionHandlerOwner {
 
@@ -102,7 +99,6 @@ public class CubaTreeWidget extends VTree implements ShortcutActionHandler.Short
     }
 
     public class CubaTreeNode extends TreeNode {
-
         @Override
         public void showContextMenu(Event event) {
             if (!readonly && !disabled) {
@@ -258,12 +254,9 @@ public class CubaTreeWidget extends VTree implements ShortcutActionHandler.Short
         customContextMenuPopup.setOwner(this);
         customContextMenuPopup.setWidget(customContextMenu);
 
-        customContextMenuPopup.addCloseHandler(new CloseHandler<PopupPanel>() {
-            @Override
-            public void onClose(CloseEvent<PopupPanel> event) {
-                customContextMenuPopup = null;
-            }
-        });
+        customContextMenuPopup.addCloseHandler(event ->
+                customContextMenuPopup = null
+        );
 
         Tools.showPopup(customContextMenuPopup, left, top);
     }

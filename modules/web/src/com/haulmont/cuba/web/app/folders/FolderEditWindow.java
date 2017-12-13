@@ -40,7 +40,12 @@ import com.haulmont.cuba.web.toolkit.ui.CubaWindow;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.ui.CheckBox;
+import com.vaadin.v7.ui.ComboBox;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -104,7 +109,7 @@ public class FolderEditWindow extends CubaWindow {
         String fieldWidth = theme.get("cuba.web.FolderEditWindow.field.width");
 
         nameField = new TextField();
-        nameField.setRequired(true);
+        nameField.setRequiredIndicatorVisible(true);
         nameField.setCaption(getMessage("folders.folderEditWindow.nameField"));
         nameField.setWidth(fieldWidth);
         nameField.setValue(folder.getName());
@@ -183,6 +188,7 @@ public class FolderEditWindow extends CubaWindow {
         cancelBtn.addClickListener(event ->
                 close()
         );
+
         buttonsLayout.addComponent(cancelBtn);
 
         if (AppUI.getCurrent().isTestMode()) {
@@ -284,9 +290,9 @@ public class FolderEditWindow extends CubaWindow {
     protected void fillPresentations(Presentations presentations) {
         presentation.removeAllItems();
 
-        final Collection<Object> availablePresentationIds = presentations.getPresentationIds();
-        for (final Object pId : availablePresentationIds) {
-            final Presentation p = presentations.getPresentation(pId);
+        Collection<Object> availablePresentationIds = presentations.getPresentationIds();
+        for (Object pId : availablePresentationIds) {
+            Presentation p = presentations.getPresentation(pId);
             presentation.addItem(p);
             presentation.setItemCaption(p, presentations.getCaption(pId));
         }

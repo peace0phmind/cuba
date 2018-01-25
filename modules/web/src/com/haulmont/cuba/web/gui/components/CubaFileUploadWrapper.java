@@ -20,7 +20,7 @@ import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.web.gui.icons.IconResolver;
-import com.haulmont.cuba.web.toolkit.ui.UploadComponent;
+import com.haulmont.cuba.web.widgets.UploadComponent;
 import com.vaadin.server.AbstractErrorMessage;
 import com.vaadin.server.CompositeErrorMessage;
 import com.vaadin.server.ErrorMessage;

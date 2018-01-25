@@ -26,7 +26,7 @@ import com.haulmont.cuba.web.WebConfig;
 import com.haulmont.cuba.web.auth.WebAuthConfig;
 import com.haulmont.cuba.web.sys.events.WebSessionDestroyedEvent;
 import com.haulmont.cuba.web.sys.events.WebSessionInitializedEvent;
-import com.haulmont.cuba.web.toolkit.ui.CubaFileUpload;
+import com.haulmont.cuba.web.widgets.CubaFileUpload;
 import com.vaadin.server.*;
 import com.vaadin.server.communication.*;
 import com.vaadin.ui.Component;

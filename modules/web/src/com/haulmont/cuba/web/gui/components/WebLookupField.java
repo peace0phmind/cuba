@@ -919,6 +919,7 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
         }
     }
 
+    // vaadin8 replace with Consumer<ErrorMessage>
     protected interface ComponentErrorHandler {
         boolean handleError(ErrorMessage message);
     }

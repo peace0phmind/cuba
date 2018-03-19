@@ -47,6 +47,7 @@ public class CubaSideMenu extends AbstractComponent implements Component.Focusab
     protected static final String MENU_ITEM_EXPANDED = "expanded";
     protected static final String MENU_ITEM_CAPTION_AS_HTML = "captionAsHtml";
     protected static final String MENU_ITEM_CUBA_ID = "cubaId";
+    protected static final String MENU_ITEM_TEST_ID = "testId";
     protected static final String MENU_ITEM_ICON = "icon";
     protected static final String MENU_ITEM_BADGE_TEXT = "badgeText";
     protected static final String MENU_ITEM_CHILDREN = "children";
@@ -279,6 +280,10 @@ public class CubaSideMenu extends AbstractComponent implements Component.Focusab
                     item.put(MENU_ITEM_CUBA_ID, Json.create(menuItem.getCubaId()));
                 }
 
+                if (menuItem.getTestId() != null) {
+                    item.put(MENU_ITEM_TEST_ID, Json.create(menuItem.getTestId()));
+                }
+
                 if (menuItem.getIcon() != null) {
                     String resourceKey = menuIconsKeyMapper.key(menuItem.getIcon());
 
@@ -340,6 +345,7 @@ public class CubaSideMenu extends AbstractComponent implements Component.Focusab
             case MENU_ITEM_ENABLED:
             case MENU_ITEM_CAPTION_AS_HTML:
             case MENU_ITEM_CUBA_ID:
+            case MENU_ITEM_TEST_ID:
             case MENU_ITEM_EXPANDED:
                 markMenuStructureAsDirty();
                 break;
@@ -406,6 +412,7 @@ public class CubaSideMenu extends AbstractComponent implements Component.Focusab
 
         protected String badgeText;
         protected String cubaId;
+        protected String testId;
 
         protected List<String> styles;
 
@@ -553,6 +560,18 @@ public class CubaSideMenu extends AbstractComponent implements Component.Focusab
                 String oldCubaId = this.cubaId;
                 this.cubaId = cubaId;
                 propertyChangeSupport.firePropertyChange(MENU_ITEM_CUBA_ID, oldCubaId, cubaId);
+            }
+        }
+
+        public String getTestId() {
+            return testId;
+        }
+
+        public void setTestId(String testId) {
+            if (!Objects.equals(this.testId, testId)) {
+                String oldTestId = this.testId;
+                this.testId = testId;
+                propertyChangeSupport.firePropertyChange(MENU_ITEM_TEST_ID, oldTestId, testId);
             }
         }
 

@@ -17,6 +17,7 @@
 package com.haulmont.cuba.web.gui.components.mainwindow;
 
 import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.cuba.gui.TestIdManager;
 import com.haulmont.cuba.gui.components.AbstractAction;
 import com.haulmont.cuba.gui.components.Button;
 import com.haulmont.cuba.gui.components.Component;
@@ -192,6 +193,11 @@ public class WebSideMenu extends WebAbstractComponent<CubaSideMenu> implements S
             return;
 
         ((MenuItemImpl) menuItem).setCubaId(menuItem.getId());
+
+        TestIdManager testIdManager = ui.getTestIdManager();
+        String testId = component.getId() + "_" + menuItem.getId();
+
+        ((MenuItemImpl) menuItem).setTestId(testIdManager.reserveId(testId));
     }
 
     @Override
@@ -456,6 +462,14 @@ public class WebSideMenu extends WebAbstractComponent<CubaSideMenu> implements S
 
         protected void setCubaId(String cubaId) {
             delegateItem.setCubaId(cubaId);
+        }
+
+        protected String getTestId() {
+            return delegateItem.getTestId();
+        }
+
+        protected void setTestId(String testId) {
+            delegateItem.setTestId(testId);
         }
 
         @Override

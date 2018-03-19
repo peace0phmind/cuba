@@ -577,7 +577,7 @@ public class CubaSideMenuWidget extends FocusableFlowPanel
 
         public void setTestId(String testId) {
             if (testId != null && !testId.isEmpty()) {
-                getElement().setAttribute("test-id", testId);
+                getElement().setAttribute("id", testId);
             }
         }
 

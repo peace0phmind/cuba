@@ -381,7 +381,6 @@ public class CubaSideMenuWidget extends FocusableFlowPanel
 
             menuItemWidget.setDescription(itemJson.getString("description"));
             menuItemWidget.setCubaId(itemJson.getString("cubaId"));
-            menuItemWidget.setTestId(itemJson.getString("testId"));
             menuItemWidget.setBadgeText(itemJson.getString("badgeText"));
 
             container.add(menuItemWidget);
@@ -572,12 +571,6 @@ public class CubaSideMenuWidget extends FocusableFlowPanel
         public void setCubaId(String cubaId) {
             if (cubaId != null && !cubaId.isEmpty()) {
                 getElement().setAttribute("cuba-id", cubaId);
-            }
-        }
-
-        public void setTestId(String testId) {
-            if (testId != null && !testId.isEmpty()) {
-                getElement().setAttribute("id", testId);
             }
         }
 

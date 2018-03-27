@@ -145,7 +145,7 @@ public class FilterDelegateImpl implements FilterDelegate {
     protected PopupButton filtersPopupButton;
     protected Component.Container conditionsLayout;
     protected BoxLayout maxResultsLayout;
-    protected Field maxResultsField;
+    protected Field<Integer> maxResultsField;
     protected TextField maxResultsTextField;
     protected LookupField maxResultsLookupField;
     protected BoxLayout controlsLayout;
@@ -154,7 +154,7 @@ public class FilterDelegateImpl implements FilterDelegate {
     protected Component applyTo;
     protected SaveAction saveAction;
     protected SaveAction saveWithValuesAction;
-    protected TextField ftsSearchCriteriaField;
+    protected TextField<String> ftsSearchCriteriaField;
     protected CheckBox ftsSwitch;
     protected LinkButton addConditionBtn;
     protected Component.Container filtersPopupBox;

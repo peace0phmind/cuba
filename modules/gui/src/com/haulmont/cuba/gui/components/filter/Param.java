@@ -500,7 +500,7 @@ public class Param {
             Object newValue = BooleanUtils.isTrue((Boolean) e.getValue()) ? true : null;
             _setValue(newValue, valueProperty);
         });
-        field.setValue(_getValue(valueProperty));
+        field.setValue((Boolean) _getValue(valueProperty));
         field.setAlignment(Component.Alignment.MIDDLE_LEFT);
         return field;
     }

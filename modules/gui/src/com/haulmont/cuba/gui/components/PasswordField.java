@@ -17,7 +17,7 @@
 
 package com.haulmont.cuba.gui.components;
 
-public interface PasswordField extends TextInputField, TextInputField.MaxLengthLimited {
+public interface PasswordField extends TextInputField<String>, TextInputField.MaxLengthLimited {
 
     String NAME = "passwordField";
 
@@ -31,8 +31,4 @@ public interface PasswordField extends TextInputField, TextInputField.MaxLengthL
      * False value disables saving passwords in browser.
      */
     void setAutocomplete(Boolean autocomplete);
-
-    @SuppressWarnings("unchecked")
-    @Override
-    String getValue();
 }

@@ -32,7 +32,7 @@ public interface EntityValueSource<E extends Entity, V> extends ValueSource<V> {
     MetaClass getMetaClass();
     MetaPropertyPath getMetaPropertyPath();
 
-    Entity<E> getItem();
+    E getItem();
 
     Subscription addInstanceChangeListener(Consumer<InstanceChangeEvent<E>> listener);
 }

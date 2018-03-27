@@ -16,12 +16,15 @@
 
 package com.haulmont.cuba.gui.components.data;
 
+import com.haulmont.bali.events.Subscription;
 import com.haulmont.cuba.gui.components.Component;
+
+import java.util.function.Consumer;
 
 /**
  * vaadin8 document
  *
- * @param <V>
+ * @param <V> todo
  */
 public interface ValueSource<V> extends Component.ValueChangeNotifier {
     V getValue();
@@ -31,5 +34,7 @@ public interface ValueSource<V> extends Component.ValueChangeNotifier {
 
     Class<V> getType();
 
-    ValueSourceStatus getStatus();
+    ValueSourceState getStatus();
+
+    Subscription addStateChangeListener(Consumer<ValueSourceStateChangeEvent<V>> listener);
 }

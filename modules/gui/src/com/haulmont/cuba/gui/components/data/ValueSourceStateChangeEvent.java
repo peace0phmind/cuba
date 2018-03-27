@@ -16,8 +16,23 @@
 
 package com.haulmont.cuba.gui.components.data;
 
-// todo status change listener
-public enum ValueSourceStatus {
-    ACTIVE,
-    INACTIVE
+import java.util.EventObject;
+
+public class ValueSourceStateChangeEvent<V> extends EventObject {
+    protected ValueSourceState status;
+
+    public ValueSourceStateChangeEvent(ValueSource<V> source, ValueSourceState status) {
+        super(source);
+        this.status = status;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public ValueSource<V> getSource() {
+        return (ValueSource<V>) super.getSource();
+    }
+
+    public ValueSourceState getState() {
+        return status;
+    }
 }

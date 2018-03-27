@@ -22,7 +22,7 @@ import com.haulmont.cuba.gui.components.Component.HasValue;
  * vaadin8 todo JavaDoc
  * vaadin8 subclasses for EntityValueBinding
  *
- * @param <T>
+ * @param <V> todo
  */
 public interface ValueBinding<V> {
     Class<V> getType();

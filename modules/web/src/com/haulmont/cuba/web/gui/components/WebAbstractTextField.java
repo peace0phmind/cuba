@@ -91,8 +91,10 @@ public abstract class WebAbstractTextField<T extends AbstractTextField, V>
     }
 
     @Override
-    public void setValue(Object value) {
-        if (!(value instanceof String)) {
+    public void setValue(V value) {
+        if (value instanceof String) {
+            component.setValue((String) value);
+        } else {
             String formattedValue;
 
             Datatype<String> stringDatatype = Datatypes.getNN(String.class);
@@ -105,16 +107,14 @@ public abstract class WebAbstractTextField<T extends AbstractTextField, V>
                 formattedValue = metadataTools.format(value);
             }
 
-            super.setValue(formattedValue);
-        } else {
-            super.setValue(value);
+            component.setValue(formattedValue);
         }
     }
 
     @Nullable
     protected Datatype getActualDatatype() {
-        if (metaProperty != null) {
-            return metaProperty.getRange().isDatatype() ? metaProperty.getRange().asDatatype() : null;
+        if (getMetaProperty() != null) {
+            return getMetaProperty().getRange().isDatatype() ? getMetaProperty().getRange().asDatatype() : null;
         } else {
             return Datatypes.getNN(String.class);
         }
@@ -124,8 +124,8 @@ public abstract class WebAbstractTextField<T extends AbstractTextField, V>
     public void setDatasource(Datasource datasource, String property) {
         super.setDatasource(datasource, property);
 
-        if (metaProperty != null) {
-            Map<String, Object> annotations = metaProperty.getAnnotations();
+        if (getMetaProperty() != null) {
+            Map<String, Object> annotations = getMetaProperty().getAnnotations();
 
             if (this instanceof CaseConversionSupported
                     && ((CaseConversionSupported) this).getCaseConversion() == CaseConversion.NONE) {
@@ -171,8 +171,8 @@ public abstract class WebAbstractTextField<T extends AbstractTextField, V>
 
     @Override
     protected void initFieldConverter() {
-        if (metaProperty != null) {
-            switch (metaProperty.getType()) {
+        if (getMetaProperty() != null) {
+            switch (getMetaProperty().getType()) {
                 case ASSOCIATION:
                     component.setConverter(new StringToEntityConverter() {
                         @Override
@@ -183,12 +183,12 @@ public abstract class WebAbstractTextField<T extends AbstractTextField, V>
                     break;
 
                 case DATATYPE:
-                    component.setConverter(new TextFieldStringToDatatypeConverter(metaProperty.getRange().asDatatype()));
+                    component.setConverter(new TextFieldStringToDatatypeConverter(getMetaProperty().getRange().asDatatype()));
                     break;
 
                 case ENUM:
                     //noinspection unchecked
-                    component.setConverter(new StringToEnumConverter((Class<Enum>) metaProperty.getJavaType()){
+                    component.setConverter(new StringToEnumConverter((Class<Enum>) getMetaProperty().getJavaType()){
                         @Override
                         public Formatter getFormatter() {
                             return WebAbstractTextField.this.getFormatter();

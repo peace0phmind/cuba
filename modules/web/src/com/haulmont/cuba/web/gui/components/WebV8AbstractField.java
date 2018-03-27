@@ -15,6 +15,7 @@
  */
 package com.haulmont.cuba.web.gui.components;
 
+import com.haulmont.bali.events.Subscription;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.chile.core.model.utils.InstanceUtils;
@@ -45,7 +46,6 @@ public abstract class WebV8AbstractField<T extends com.vaadin.ui.AbstractField, 
 
     protected boolean editable = true;
 
-    protected ValueSource<V> valueSource;
     protected ValueBinding<V> valueBinding;
 
     protected EditableChangeListener parentEditableChangeListener;
@@ -56,7 +56,6 @@ public abstract class WebV8AbstractField<T extends com.vaadin.ui.AbstractField, 
             valueBinding.unbind();
 
             this.valueBinding = null;
-            this.valueSource = null;
         }
 
         if (valueSource != null) {
@@ -64,37 +63,37 @@ public abstract class WebV8AbstractField<T extends com.vaadin.ui.AbstractField, 
             ValueBinder binder = AppBeans.get(ValueBinder.class);
 
             this.valueBinding = binder.bind(this, valueSource);
-            this.valueSource = valueSource;
         }
     }
 
     @Override
     public ValueSource<V> getValueSource() {
-        return valueSource;
+        return valueBinding != null ? valueBinding.getSource() : null;
     }
 
     @Override
     public Datasource getDatasource() {
-        if (valueSource == null) {
+        if (valueBinding == null) {
             return null;
         }
-        return ((DatasourceValueSource) valueSource).getDatasource();
+
+        return ((DatasourceValueSource) valueBinding.getSource()).getDatasource();
     }
 
     @Override
     public MetaProperty getMetaProperty() {
-        if (valueSource == null) {
+        if (valueBinding == null) {
             return null;
         }
-        return ((DatasourceValueSource) valueSource).getMetaPropertyPath().getMetaProperty();
+        return ((DatasourceValueSource) valueBinding.getSource()).getMetaPropertyPath().getMetaProperty();
     }
 
     @Override
     public MetaPropertyPath getMetaPropertyPath() {
-        if (valueSource == null) {
+        if (valueBinding == null) {
             return null;
         }
-        return ((DatasourceValueSource) valueSource).getMetaPropertyPath();
+        return ((DatasourceValueSource) valueBinding.getSource()).getMetaPropertyPath();
     }
 
     @SuppressWarnings("unchecked")
@@ -192,18 +191,10 @@ public abstract class WebV8AbstractField<T extends com.vaadin.ui.AbstractField, 
     }
 
     @Override
-    public void addListener(ValueListener listener) {
-        addValueChangeListener(new ComponentValueListenerWrapper(listener));
-    }
-
-    @Override
-    public void removeListener(ValueListener listener) {
-        removeValueChangeListener(new ComponentValueListenerWrapper(listener));
-    }
-
-    @Override
-    public void addValueChangeListener(ValueChangeListener listener) {
+    public Subscription addValueChangeListener(ValueChangeListener listener) {
         getEventRouter().addListener(ValueChangeListener.class, listener);
+        // todo
+        return () -> {};
     }
 
     @Override

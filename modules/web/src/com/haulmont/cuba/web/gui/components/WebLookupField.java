@@ -40,7 +40,6 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ErrorMessage;
 import com.vaadin.v7.data.Item;
 import com.vaadin.v7.data.Property;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ import static com.vaadin.event.ShortcutAction.KeyCode;
 import static com.vaadin.event.ShortcutAction.ModifierKey;
 import static com.vaadin.v7.ui.AbstractSelect.ItemCaptionMode;
 
-public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implements LookupField {
+public class WebLookupField<V> extends WebAbstractOptionsField<CubaComboBox, V> implements LookupField<V> {
 
     protected Object nullOption;
     protected Entity nullEntity;
@@ -148,7 +147,7 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
 
     @Override
     public void setValue(@Nullable Object value) {
-        super.setValue(getValueFromOptions(value));
+        super.setValue((V) getValueFromOptions(value));
 
         checkMissingValue();
     }
@@ -164,9 +163,9 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getValue() {
+    public V getValue() {
         final Object value = super.getValue();
-        return (T) getValueFromOptions(value);
+        return (V) getValueFromOptions(value);
     }
 
     @Override
@@ -190,8 +189,8 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
     protected void attachListener(CubaComboBox component) {
         component.addValueChangeListener(vEvent -> {
             final Object value = getValue();
-            final Object oldValue = prevValue;
-            prevValue = value;
+            final Object oldValue = internalValue;
+            internalValue = (V) value;
 
             if (hasValidationError()) {
                 setValidationError(null);
@@ -281,7 +280,8 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
 
     @Override
     public void setOptionsDatasource(CollectionDatasource datasource) {
-        if (this.datasource == datasource)
+        if (this.getDatasource() == datasource)
+            // todo why ?
             return;
 
         if (this.optionsDatasource != null) {
@@ -308,8 +308,6 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
                 initNullEntity();
 
             checkMissingValue();
-
-            assignAutoDebugId();
         }
     }
 
@@ -345,21 +343,6 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
         super.setOptionsEnum(optionsEnum);
 
         checkMissingValue();
-    }
-
-    @Override
-    protected String getAlternativeDebugId() {
-        if (id != null) {
-            return id;
-        }
-        if (datasource != null && StringUtils.isNotEmpty(datasource.getId()) && metaPropertyPath != null) {
-            return getClass().getSimpleName() + "_" + datasource.getId() + "_" + metaPropertyPath.toString();
-        }
-        if (optionsDatasource != null && StringUtils.isNotEmpty(optionsDatasource.getId())) {
-            return getClass().getSimpleName() + "_" + optionsDatasource.getId();
-        }
-
-        return getClass().getSimpleName();
     }
 
     @Override

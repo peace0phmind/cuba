@@ -16,7 +16,9 @@
  */
 package com.haulmont.cuba.gui.components;
 
+import com.haulmont.bali.events.Subscription;
 import com.haulmont.cuba.gui.app.security.role.edit.UiPermissionDescriptor;
+import com.haulmont.cuba.gui.components.compatibility.ComponentValueListenerWrapper;
 import com.haulmont.cuba.gui.data.ValueListener;
 import com.haulmont.cuba.gui.icons.Icons;
 import com.haulmont.cuba.gui.presentations.Presentations;
@@ -544,6 +546,8 @@ public interface Component {
 
     /**
      * Describes value change event.
+     *
+     * todo V parameter
      */
     class ValueChangeEvent {
         private final Component.HasValue component;
@@ -597,7 +601,7 @@ public interface Component {
      * vaadin8
      */
     interface ValueChangeNotifier {
-        void addValueChangeListener(ValueChangeListener listener);
+        Subscription addValueChangeListener(ValueChangeListener listener);
         void removeValueChangeListener(ValueChangeListener listener);
     }
 
@@ -614,9 +618,14 @@ public interface Component {
          * @deprecated Use {@link #addValueChangeListener(ValueChangeListener)}
          */
         @Deprecated
-        void addListener(ValueListener listener);
+        default void addListener(ValueListener listener) {
+            addValueChangeListener(new ComponentValueListenerWrapper(listener));
+        }
+
         @Deprecated
-        void removeListener(ValueListener listener);
+        default void removeListener(ValueListener listener) {
+            removeValueChangeListener(new ComponentValueListenerWrapper(listener));
+        }
     }
 
     /**

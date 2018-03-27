@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.gui.components.data;
 
+import com.haulmont.bali.events.Subscription;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.MetaPropertyPath;
@@ -67,9 +68,7 @@ public class ValueBinder {
 
         initFieldValue(component, valueSource);
 
-        // todo attach value change listener for component
-
-        // todo attach value change listener for source (weak)
+        binding.bind(component, valueSource);
 
         if (valueSource instanceof EntityValueSource
                 && component instanceof Field) {
@@ -80,7 +79,7 @@ public class ValueBinder {
     }
 
     protected <V> void initFieldValue(Component.HasValue<V> component, ValueSource<V> valueSource) {
-        if (valueSource.getStatus() == ValueSourceStatus.ACTIVE) {
+        if (valueSource.getStatus() == ValueSourceState.ACTIVE) {
             component.setValue(valueSource.getValue());
         }
     }
@@ -117,22 +116,15 @@ public class ValueBinder {
         }
     }
 
-    protected void disableBeanValidator(Field<?> component) {
-        Collection<Field.Validator> validators = component.getValidators();
-
-        for (Field.Validator validator : validators.toArray(new Field.Validator[validators.size()])) {
-            if (validator instanceof BeanValidator) {
-                component.removeValidator(validator);
-            }
-        }
-    }
-
     protected static class ValueBindingImpl<V> implements ValueBinding<V> {
         protected Class<V> type;
         protected ValueSource<V> source;
         protected Component.HasValue<V> component;
 
-        // todo listener subscriptions
+        protected Subscription componentValueChangeSubscription;
+
+        protected Subscription sourceValueChangeSubscription;
+        protected Subscription sourceStateChangeSupscription;
 
         public ValueBindingImpl(Class<V> type, ValueSource<V> source, Component.HasValue<V> component) {
             this.type = type;
@@ -157,7 +149,61 @@ public class ValueBinder {
 
         @Override
         public void unbind() {
-            // todo remove listeners
+            if (this.componentValueChangeSubscription != null) {
+                this.componentValueChangeSubscription.remove();
+                this.componentValueChangeSubscription = null;
+            }
+
+            if (this.sourceValueChangeSubscription != null) {
+                this.sourceValueChangeSubscription.remove();
+                this.sourceValueChangeSubscription = null;
+            }
+
+            if (this.sourceStateChangeSupscription != null) {
+                this.sourceStateChangeSupscription.remove();
+                this.sourceStateChangeSupscription = null;
+            }
+
+            if (component instanceof Field) {
+                disableBeanValidator((Field<?>) component);
+            }
+        }
+
+        protected void disableBeanValidator(Field<?> component) {
+            Collection<Field.Validator> validators = component.getValidators();
+
+            for (Field.Validator validator : validators.toArray(new Field.Validator[validators.size()])) {
+                if (validator instanceof BeanValidator) {
+                    component.removeValidator(validator);
+                }
+            }
+        }
+
+        public void bind(Component.HasValue<V> component, ValueSource<V> valueSource) {
+            this.componentValueChangeSubscription = component.addValueChangeListener(this::componentValueChanged);
+
+            // todo weak references on binding !
+            this.sourceValueChangeSubscription = valueSource.addValueChangeListener(this::sourceValueChanged);
+            this.sourceStateChangeSupscription = valueSource.addStateChangeListener(this::valueSourceStateChanged);
+        }
+
+        protected void valueSourceStateChanged(ValueSourceStateChangeEvent<V> event) {
+            if (event.getState() == ValueSourceState.ACTIVE) {
+                // read value to component
+                component.setValue(source.getValue());
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        protected void componentValueChanged(@SuppressWarnings("unused") Component.ValueChangeEvent event) {
+            if (source.getStatus() == ValueSourceState.ACTIVE) {
+                source.setValue((V) event.getValue());
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        protected void sourceValueChanged(@SuppressWarnings("unused") Component.ValueChangeEvent event) {
+            component.setValue((V) event.getValue());
         }
     }
 }

@@ -1190,6 +1190,7 @@ public class WebWindowManager extends WindowManager {
 
         VerticalLayout layout = new VerticalLayout();
         layout.setStyleName("c-app-message-dialog");
+        layout.setMargin(false);
         layout.setSpacing(true);
         if (messageType.getWidth() != null && messageType.getWidth() == AUTO_SIZE_PX) {
             layout.setWidthUndefined();
@@ -1351,6 +1352,7 @@ public class WebWindowManager extends WindowManager {
 
         VerticalLayout layout = new VerticalLayout();
         layout.setStyleName("c-app-option-dialog");
+        layout.setMargin(false);
         layout.setSpacing(true);
         if (messageType.getWidth() != null && messageType.getWidth() == AUTO_SIZE_PX) {
             layout.setWidthUndefined();
@@ -1358,6 +1360,7 @@ public class WebWindowManager extends WindowManager {
         window.setContent(layout);
 
         HorizontalLayout buttonsContainer = new HorizontalLayout();
+        buttonsContainer.setMargin(false);
         buttonsContainer.setSpacing(true);
 
         boolean hasPrimaryAction = false;

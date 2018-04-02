@@ -82,7 +82,7 @@ public class SendingMessageBrowser extends AbstractWindow {
     protected TextField<String> bodyContentTypeField;
 
     protected Button showContentButton;
-    protected TextArea contentTextArea;
+    protected TextArea<String> contentTextArea;
 
     @Override
     public void init(Map<String, Object> params) {

@@ -130,6 +130,13 @@ public interface Component {
     @Deprecated
     int getHeightUnits();
 
+    /**
+     * TODO: gg, JavaDoc
+     *
+     * @return
+     */
+    SizeUnit getHeightSizeUnit();
+
     /** Set component height in {@link #getHeightUnits()} */
     void setHeight(String height);
 
@@ -149,6 +156,13 @@ public interface Component {
     /** Width units: {@link #UNITS_PIXELS}, {@link #UNITS_PERCENTAGE} */
     @Deprecated
     int getWidthUnits();
+
+    /**
+     * TODO: gg, JavaDoc
+     *
+     * @return
+     */
+    SizeUnit getWidthSizeUnit();
 
     /** Set component width in {@link #getWidthUnits()} */
     void setWidth(String width);

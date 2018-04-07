@@ -39,13 +39,38 @@ public interface SplitPanel extends Component.Container, Component.BelongToFrame
     void setOrientation(int orientation);
 
     void setSplitPosition(int pos);
+
+    /**
+     * @deprecated Use {@link #setSplitPosition(int, SizeUnit)}
+     */
+    @Deprecated
     void setSplitPosition(int pos, int unit);
+
+    /**
+     * TODO: gg, JavaDoc
+     *
+     * @param pos
+     * @param unit
+     */
+    void setSplitPosition(int pos, SizeUnit unit);
 
     /**
      * Set position of split from the left side by default.
      * If reversePosition is true position will be set from right.
+     *
+     * @deprecated Use {@link #setSplitPosition(int, SizeUnit, boolean)}
      */
+    @Deprecated
     void setSplitPosition(int pos, int unit, boolean reversePosition);
+
+    /**
+     * TODO: gg, JavaDoc
+     *
+     * @param pos
+     * @param unit
+     * @param reversePosition
+     */
+    void setSplitPosition(int pos, SizeUnit unit, boolean reversePosition);
 
     /**
      * @return position of the splitter.
@@ -56,7 +81,15 @@ public interface SplitPanel extends Component.Container, Component.BelongToFrame
      * @return unit of the splitter position.
      * See {@link Component#UNITS_PIXELS} and {@link Component#UNITS_PERCENTAGE}
      */
+    @Deprecated
     int getSplitPositionUnit();
+
+    /**
+     * TODO: gg, JavaDoc
+     *
+     * @return
+     */
+    SizeUnit getSplitPositionSizeUnit();
 
     /**
      * Return from which side position is set.
@@ -66,14 +99,36 @@ public interface SplitPanel extends Component.Container, Component.BelongToFrame
     /**
      * Set minimum available position of split.
      * Minimum position of split will be set from the right if position is reversed.
+     *
+     * @deprecated Use {@link #setMinSplitPosition(int, SizeUnit)}
      */
+    @Deprecated
     void setMinSplitPosition(int pos, int unit);
+
+    /**
+     * TODO: gg, JavaDoc
+     *
+     * @param pos
+     * @param unit
+     */
+    void setMinSplitPosition(int pos, SizeUnit unit);
 
     /**
      * Set maximum available position of split.
      * Maximum position of split will be set from the right if position is reversed.
+     *
+     * @deprecated Use {@link #setMaxSplitPosition(int, SizeUnit)}
      */
+    @Deprecated
     void setMaxSplitPosition(int pos, int unit);
+
+    /**
+     * TODO: gg, JavaDoc
+     *
+     * @param pos
+     * @param unit
+     */
+    void setMaxSplitPosition(int pos, SizeUnit unit);
 
     /**
      * Sets whether users are able to change the separator position or not.

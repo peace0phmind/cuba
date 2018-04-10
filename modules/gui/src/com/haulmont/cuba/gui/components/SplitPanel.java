@@ -47,10 +47,10 @@ public interface SplitPanel extends Component.Container, Component.BelongToFrame
     void setSplitPosition(int pos, int unit);
 
     /**
-     * TODO: gg, JavaDoc
+     * Set position of split from the left side by default.
      *
-     * @param pos
-     * @param unit
+     * @param pos  the new size of the first region.
+     * @param unit the unit (from {@link SizeUnit}) in which the size is given.
      */
     void setSplitPosition(int pos, SizeUnit unit);
 
@@ -64,11 +64,13 @@ public interface SplitPanel extends Component.Container, Component.BelongToFrame
     void setSplitPosition(int pos, int unit, boolean reversePosition);
 
     /**
-     * TODO: gg, JavaDoc
+     * Set position of split from the left side by default.
+     * If reversePosition is true position will be set from right.
      *
-     * @param pos
-     * @param unit
-     * @param reversePosition
+     * @param pos             the new size of the first region.
+     * @param unit            the unit (from {@link SizeUnit}) in which the size is given.
+     * @param reversePosition if set to true the split splitter position is measured
+     *                        by the second region else it is measured by the first region
      */
     void setSplitPosition(int pos, SizeUnit unit, boolean reversePosition);
 
@@ -85,9 +87,9 @@ public interface SplitPanel extends Component.Container, Component.BelongToFrame
     int getSplitPositionUnit();
 
     /**
-     * TODO: gg, JavaDoc
+     * Returns the unit of position of the splitter.
      *
-     * @return
+     * @return unit of position of the splitter
      */
     SizeUnit getSplitPositionSizeUnit();
 
@@ -106,10 +108,11 @@ public interface SplitPanel extends Component.Container, Component.BelongToFrame
     void setMinSplitPosition(int pos, int unit);
 
     /**
-     * TODO: gg, JavaDoc
+     * Sets the minimum split position to the given position and unit. If the
+     * split position is reversed, maximum and minimum are also reversed.
      *
-     * @param pos
-     * @param unit
+     * @param pos  the new size of the first region.
+     * @param unit the unit (from {@link SizeUnit}) in which the size is given.
      */
     void setMinSplitPosition(int pos, SizeUnit unit);
 
@@ -123,10 +126,11 @@ public interface SplitPanel extends Component.Container, Component.BelongToFrame
     void setMaxSplitPosition(int pos, int unit);
 
     /**
-     * TODO: gg, JavaDoc
+     * Sets the maximum split position to the given position and unit. If the
+     * split position is reversed, maximum and minimum are also reversed.
      *
-     * @param pos
-     * @param unit
+     * @param pos  the new size of the first region.
+     * @param unit the unit (from {@link SizeUnit}) in which the size is given.
      */
     void setMaxSplitPosition(int pos, SizeUnit unit);
 

@@ -131,9 +131,9 @@ public interface Component {
     int getHeightUnits();
 
     /**
-     * TODO: gg, JavaDoc
+     * Gets the height property units.
      *
-     * @return
+     * @return units used in height property.
      */
     SizeUnit getHeightSizeUnit();
 
@@ -158,9 +158,9 @@ public interface Component {
     int getWidthUnits();
 
     /**
-     * TODO: gg, JavaDoc
+     * Gets the width property units.
      *
-     * @return
+     * @return units used in the width property.
      */
     SizeUnit getWidthSizeUnit();
 

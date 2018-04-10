@@ -57,9 +57,9 @@ public interface PopupButton extends Component.ActionsHolder, Component.HasCapti
     int getMenuWidthUnits();
 
     /**
-     * TODO: gg, JavaDoc
+     * Gets the menu width property units.
      *
-     * @return
+     * @return units used in the menu width property.
      */
     SizeUnit getMenuWidthSizeUnit();
 

@@ -990,7 +990,7 @@ public class FilterDelegateImpl implements FilterDelegate {
 
     protected String getControlsLayoutStyleName() {
         String styleName = "filter-control-no-border";
-        if (conditionsLayout.isVisible() && !conditionsLayout.getComponents().isEmpty()) {
+        if (conditionsLayout.isVisibleRecursive() && !conditionsLayout.getComponents().isEmpty()) {
             styleName = CONDITIONS_LOCATION_TOP.equals(conditionsLocation) ? "filter-control-with-top-border"
                     : "filter-control-with-bottom-border";
         }

@@ -92,7 +92,7 @@ public class WebLookupField<V> extends WebAbstractOptionsField<CubaComboBox, V> 
         component.addShortcutListener(new ShortcutListener("clearShortcut", KeyCode.DELETE, new int[]{ModifierKey.SHIFT}) {
             @Override
             public void handleAction(Object sender, Object target) {
-                if (!isRequired() && isEnabled() && isEditable()) {
+                if (!isRequired() && isEnabledRecursive() && isEditableWithParent()) {
                     setValue(null);
                 }
             }

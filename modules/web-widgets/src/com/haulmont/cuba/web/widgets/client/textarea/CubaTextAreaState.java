@@ -17,7 +17,7 @@
 package com.haulmont.cuba.web.widgets.client.textarea;
 
 import com.vaadin.shared.annotations.NoLayout;
-import com.vaadin.v7.shared.ui.textarea.TextAreaState;
+import com.vaadin.shared.ui.textarea.TextAreaState;
 
 public class CubaTextAreaState extends TextAreaState {
 

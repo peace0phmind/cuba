@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2016 Haulmont.
+ * Copyright (c) 2008-2018 Haulmont.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,14 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-package com.haulmont.cuba.web.widgets.client.passwordfield;
+package com.haulmont.cuba.web.gui.components.util;
 
-import com.vaadin.shared.ui.passwordfield.PasswordFieldState;
-
-public class CubaPasswordFieldState extends PasswordFieldState {
-
-    public boolean autocomplete = false;
+@FunctionalInterface
+public interface ShortcutListenerHandler {
+    void handle(Object sender, Object target);
 }

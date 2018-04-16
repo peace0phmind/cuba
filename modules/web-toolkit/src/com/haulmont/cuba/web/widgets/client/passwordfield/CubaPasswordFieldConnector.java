@@ -19,7 +19,7 @@ package com.haulmont.cuba.web.widgets.client.passwordfield;
 
 import com.haulmont.cuba.web.widgets.CubaPasswordField;
 import com.vaadin.client.communication.StateChangeEvent;
-import com.vaadin.v7.client.ui.passwordfield.PasswordFieldConnector;
+import com.vaadin.client.ui.passwordfield.PasswordFieldConnector;
 import com.vaadin.shared.ui.Connect;
 
 @Connect(CubaPasswordField.class)

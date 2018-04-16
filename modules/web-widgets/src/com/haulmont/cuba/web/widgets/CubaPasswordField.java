@@ -16,18 +16,16 @@
 
 package com.haulmont.cuba.web.widgets;
 
-import com.vaadin.server.AbstractErrorMessage;
-import com.vaadin.server.CompositeErrorMessage;
-import com.vaadin.server.ErrorMessage;
-import com.vaadin.v7.ui.PasswordField;
 import com.haulmont.cuba.web.widgets.client.passwordfield.CubaPasswordFieldState;
+import com.vaadin.ui.PasswordField;
 
 public class CubaPasswordField extends PasswordField {
 
     public CubaPasswordField() {
-        setValidationVisible(false);
-        setShowBufferedSourceException(false);
-        setShowErrorForDisabledState(false);
+//        vaadin8
+//        setValidationVisible(false);
+//        setShowBufferedSourceException(false);
+//        setShowErrorForDisabledState(false);
         setAutocomplete(false);
     }
 
@@ -51,7 +49,8 @@ public class CubaPasswordField extends PasswordField {
         }
     }
 
-    @Override
+    // vaadin8
+    /*@Override
     public ErrorMessage getErrorMessage() {
         ErrorMessage superError = super.getErrorMessage();
         if (!isReadOnly() && isRequired() && isEmpty()) {
@@ -64,5 +63,5 @@ public class CubaPasswordField extends PasswordField {
         }
 
         return superError;
-    }
+    }*/
 }

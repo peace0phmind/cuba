@@ -102,7 +102,7 @@ public class UiPermissionsFrame extends AbstractFrame {
 
         WindowConfig windowConfig = AppBeans.get(WindowConfig.NAME);
         Collection<WindowInfo> windows = sortWindowInfos(windowConfig.getWindows());
-        Map<String, Object> screens = new LinkedHashMap<>();
+        Map<String, String> screens = new LinkedHashMap<>();
         for (WindowInfo windowInfo : windows) {
             String id = windowInfo.getId();
             String menuId = "menu-config." + id;

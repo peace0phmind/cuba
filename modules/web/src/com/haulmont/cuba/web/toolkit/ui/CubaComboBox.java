@@ -25,6 +25,8 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.*;
 import com.vaadin.ui.ComboBox;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -38,6 +40,7 @@ public class CubaComboBox extends ComboBox implements Action.Container {
     protected OptionIconProvider optionIconProvider;
 
     protected BiFunction<Object, Object, Boolean> customValueEquals;
+    protected BiFunction<Collection<?>, String, List<?>> searchExecutor;
 
     public CubaComboBox() {
         setValidationVisible(false);
@@ -206,6 +209,18 @@ public class CubaComboBox extends ComboBox implements Action.Container {
 
     public void setCustomValueEquals(BiFunction<Object, Object, Boolean> customValueEquals) {
         this.customValueEquals = customValueEquals;
+    }
+
+    public void setSearchExecutor(BiFunction<Collection<?>, String, List<?>> searchExecutor) {
+        this.searchExecutor = searchExecutor;
+    }
+
+    @Override
+    protected List<?> getFilteredOptions() {
+        if (searchExecutor != null) {
+            return searchExecutor.apply(getItemIds(), filterstring);
+        }
+        return super.getFilteredOptions();
     }
 
     public interface OptionIconProvider {

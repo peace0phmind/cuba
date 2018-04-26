@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.web.gui.components;
 
+import com.haulmont.bali.util.DateTimeUtils;
 import com.haulmont.bali.util.Preconditions;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.utils.InstanceUtils;
@@ -25,17 +26,20 @@ import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.TimeSource;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.components.DatePicker;
-import com.haulmont.cuba.gui.components.Frame;
+import com.haulmont.cuba.gui.components.data.ConversionException;
 import com.haulmont.cuba.web.widgets.CubaDatePicker;
-import com.vaadin.v7.ui.InlineDateField;
+import com.vaadin.shared.ui.datefield.DateResolution;
+import com.vaadin.ui.InlineDateField;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Past;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
-public class WebDatePicker<V extends Date> extends WebAbstractField<InlineDateField, V> implements DatePicker<V> {
+public class WebDatePicker<V extends Date> extends WebV8AbstractField<InlineDateField, LocalDate, V>
+        implements DatePicker<V> {
 
     protected Resolution resolution = Resolution.DAY;
 
@@ -43,8 +47,9 @@ public class WebDatePicker<V extends Date> extends WebAbstractField<InlineDateFi
 
     public WebDatePicker() {
         this.component = new CubaDatePicker();
-        attachListener(component);
-        component.setInvalidCommitted(true);
+        attachValueChangeListener(component);
+        // VAADIN8: gg,
+//        component.setInvalidCommitted(true);
 
         Messages messages = AppBeans.get(Messages.NAME);
         component.setDateOutOfRangeMessage(messages.getMainMessage("datePicker.dateOutOfRangeMessage"));
@@ -60,26 +65,25 @@ public class WebDatePicker<V extends Date> extends WebAbstractField<InlineDateFi
         Preconditions.checkNotNullArgument(resolution);
 
         this.resolution = resolution;
-        com.vaadin.v7.shared.ui.datefield.Resolution vResolution;
+        DateResolution vResolution;
         switch (resolution) {
             case MONTH:
-                vResolution = com.vaadin.v7.shared.ui.datefield.Resolution.MONTH;
+                vResolution = com.vaadin.shared.ui.datefield.DateResolution.MONTH;
                 break;
             case YEAR:
-                vResolution = com.vaadin.v7.shared.ui.datefield.Resolution.YEAR;
+                vResolution = com.vaadin.shared.ui.datefield.DateResolution.YEAR;
                 break;
             case DAY:
-                vResolution = com.vaadin.v7.shared.ui.datefield.Resolution.DAY;
-                break;
             default:
-                vResolution = com.vaadin.v7.shared.ui.datefield.Resolution.DAY;
+                vResolution = com.vaadin.shared.ui.datefield.DateResolution.DAY;
                 break;
         }
 
         component.setResolution(vResolution);
     }
 
-    protected boolean checkRange(Date value) {
+    // VAADIN8: gg, need to use?
+    /*protected boolean checkRange(Date value) {
         if (updatingInstance) {
             return true;
         }
@@ -97,9 +101,10 @@ public class WebDatePicker<V extends Date> extends WebAbstractField<InlineDateFi
         }
 
         return true;
-    }
+    }*/
 
-    protected void handleDateOutOfRange(Date value) {
+    // VAADIN8: gg, need to use?
+    /*protected void handleDateOutOfRange(Date value) {
         if (getFrame() != null) {
             Messages messages = AppBeans.get(Messages.NAME);
             getFrame().showNotification(messages.getMainMessage("datePicker.dateOutOfRangeMessage"),
@@ -112,7 +117,7 @@ public class WebDatePicker<V extends Date> extends WebAbstractField<InlineDateFi
         } finally {
             updatingInstance = false;
         }
-    }
+    }*/
 
 /*  todo
     @Override
@@ -208,6 +213,7 @@ public class WebDatePicker<V extends Date> extends WebAbstractField<InlineDateFi
         }
     }*/
 
+    // VAADIN8: gg, apply it somehow
     protected void setDateRangeByProperty(MetaProperty metaProperty) {
         UserSessionSource sessionSource = AppBeans.get(UserSessionSource.NAME);
 
@@ -239,22 +245,27 @@ public class WebDatePicker<V extends Date> extends WebAbstractField<InlineDateFi
         }
     }
 
-    protected Date constructDate() {
-        Date datePickerDate = component.getValue();
-        if (datePickerDate == null) {
+    @SuppressWarnings("unchecked")
+    @Override
+    protected V convertToModel(LocalDate componentRawValue) throws ConversionException {
+        if (componentRawValue == null) {
             return null;
         }
 
+        Date datePickerDate = DateTimeUtils.asDate(componentRawValue);
         if (getMetaProperty() != null) {
             Class javaClass = getMetaProperty().getRange().asDatatype().getJavaClass();
             if (javaClass.equals(java.sql.Date.class)) {
-                return new java.sql.Date(datePickerDate.getTime());
-            } else {
-                return datePickerDate;
+                return (V) new java.sql.Date(datePickerDate.getTime());
             }
-        } else {
-            return datePickerDate;
         }
+
+        return (V) datePickerDate;
+    }
+
+    @Override
+    protected LocalDate convertToPresentation(Date modelValue) throws ConversionException {
+        return DateTimeUtils.asLocalDate(modelValue);
     }
 
     protected Date getEntityValue(Entity item) {
@@ -272,36 +283,38 @@ public class WebDatePicker<V extends Date> extends WebAbstractField<InlineDateFi
         }
     }
 
-    protected void setValueToFields(Date value) {
+    // VAADIN8: gg, need to use?
+    /*protected void setValueToFields(Date value) {
         updatingInstance = true;
         try {
             component.setValueIgnoreReadOnly(value);
         } finally {
             updatingInstance = false;
         }
-    }
+    }*/
 
     @Override
     public Date getRangeStart() {
-        return component.getRangeStart();
+        return DateTimeUtils.asDate(component.getRangeStart());
     }
 
     @Override
     public void setRangeStart(Date rangeStart) {
-        component.setRangeStart(rangeStart);
+        component.setRangeStart(DateTimeUtils.asLocalDate(rangeStart));
     }
 
     @Override
     public Date getRangeEnd() {
-        return component.getRangeEnd();
+        return DateTimeUtils.asDate(component.getRangeEnd());
     }
 
     @Override
     public void setRangeEnd(Date rangeEnd) {
-        component.setRangeEnd(rangeEnd);
+        component.setRangeEnd(DateTimeUtils.asLocalDate(rangeEnd));
     }
 
-    @SuppressWarnings("unchecked")
+    // VAADIN8: gg,
+    /*@SuppressWarnings("unchecked")
     @Override
     public V getValue() {
         return (V) constructDate();
@@ -311,9 +324,10 @@ public class WebDatePicker<V extends Date> extends WebAbstractField<InlineDateFi
     public void setValue(V value) {
         setValueToFields(value);
         updateInstance();
-    }
+    }*/
 
-    protected void updateInstance() {
+    // VAADIN8: gg, need to use?
+    /*protected void updateInstance() {
         if (updatingInstance) {
             return;
         }
@@ -333,7 +347,7 @@ public class WebDatePicker<V extends Date> extends WebAbstractField<InlineDateFi
 
         Object newValue = getValue();
         fireValueChanged(newValue);
-    }
+    }*/
 
     @Override
     public int getTabIndex() {

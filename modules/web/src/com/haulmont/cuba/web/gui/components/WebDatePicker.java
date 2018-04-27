@@ -19,39 +19,50 @@ package com.haulmont.cuba.web.gui.components;
 import com.haulmont.bali.util.DateTimeUtils;
 import com.haulmont.bali.util.Preconditions;
 import com.haulmont.chile.core.model.MetaProperty;
-import com.haulmont.chile.core.model.utils.InstanceUtils;
-import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.AppBeans;
+import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.TimeSource;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.components.DatePicker;
 import com.haulmont.cuba.gui.components.data.ConversionException;
+import com.haulmont.cuba.gui.components.data.DatasourceValueSource;
+import com.haulmont.cuba.gui.components.data.ValueSource;
 import com.haulmont.cuba.web.widgets.CubaDatePicker;
 import com.vaadin.shared.ui.datefield.DateResolution;
 import com.vaadin.ui.InlineDateField;
+import org.springframework.beans.factory.InitializingBean;
 
+import javax.inject.Inject;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Objects;
 
 public class WebDatePicker<V extends Date> extends WebV8AbstractField<InlineDateField, LocalDate, V>
-        implements DatePicker<V> {
+        implements DatePicker<V>, InitializingBean {
 
     protected Resolution resolution = Resolution.DAY;
 
-    protected boolean updatingInstance;
+    // VAADIN8: gg, remove?
+//    protected boolean updatingInstance;
+
+    @Inject
+    protected Messages messages;
+    @Inject
+    protected UserSessionSource sessionSource;
+    @Inject
+    protected TimeSource timeSource;
 
     public WebDatePicker() {
         this.component = new CubaDatePicker();
         attachValueChangeListener(component);
         // VAADIN8: gg,
 //        component.setInvalidCommitted(true);
+    }
 
-        Messages messages = AppBeans.get(Messages.NAME);
+    @Override
+    public void afterPropertiesSet() throws Exception {
         component.setDateOutOfRangeMessage(messages.getMainMessage("datePicker.dateOutOfRangeMessage"));
     }
 
@@ -213,12 +224,16 @@ public class WebDatePicker<V extends Date> extends WebV8AbstractField<InlineDate
         }
     }*/
 
-    // VAADIN8: gg, apply it somehow
-    protected void setDateRangeByProperty(MetaProperty metaProperty) {
-        UserSessionSource sessionSource = AppBeans.get(UserSessionSource.NAME);
+    @Override
+    protected void valueBindingActivated(ValueSource<V> valueSource) {
+        if (valueSource instanceof DatasourceValueSource) {
+            MetaPropertyPath metaPropertyPath = ((DatasourceValueSource) valueSource).getMetaPropertyPath();
+            setDateRangeByProperty(metaPropertyPath.getMetaProperty());
+        }
+    }
 
+    protected void setDateRangeByProperty(MetaProperty metaProperty) {
         if (metaProperty.getAnnotations().get(Past.class.getName()) != null) {
-            TimeSource timeSource = AppBeans.get(TimeSource.NAME);
             Date currentTimestamp = timeSource.currentTimestamp();
 
             Calendar calendar = Calendar.getInstance(sessionSource.getLocale());
@@ -230,7 +245,6 @@ public class WebDatePicker<V extends Date> extends WebV8AbstractField<InlineDate
 
             setRangeEnd(calendar.getTime());
         } else if (metaProperty.getAnnotations().get(Future.class.getName()) != null) {
-            TimeSource timeSource = AppBeans.get(TimeSource.NAME);
             Date currentTimestamp = timeSource.currentTimestamp();
 
             Calendar calendar = Calendar.getInstance(sessionSource.getLocale());
@@ -268,31 +282,6 @@ public class WebDatePicker<V extends Date> extends WebV8AbstractField<InlineDate
         return DateTimeUtils.asLocalDate(modelValue);
     }
 
-    protected Date getEntityValue(Entity item) {
-        return InstanceUtils.getValueEx(item, getMetaPropertyPath().getPath());
-    }
-
-    protected void fireValueChanged(Object value) {
-        Object oldValue = internalValue;
-
-        if (!Objects.equals(oldValue, value)) {
-            internalValue = (V) value;
-
-            ValueChangeEvent event = new ValueChangeEvent(this, oldValue, value);
-            getEventRouter().fireEvent(ValueChangeListener.class, ValueChangeListener::valueChanged, event);
-        }
-    }
-
-    // VAADIN8: gg, need to use?
-    /*protected void setValueToFields(Date value) {
-        updatingInstance = true;
-        try {
-            component.setValueIgnoreReadOnly(value);
-        } finally {
-            updatingInstance = false;
-        }
-    }*/
-
     @Override
     public Date getRangeStart() {
         return DateTimeUtils.asDate(component.getRangeStart());
@@ -312,42 +301,6 @@ public class WebDatePicker<V extends Date> extends WebV8AbstractField<InlineDate
     public void setRangeEnd(Date rangeEnd) {
         component.setRangeEnd(DateTimeUtils.asLocalDate(rangeEnd));
     }
-
-    // VAADIN8: gg,
-    /*@SuppressWarnings("unchecked")
-    @Override
-    public V getValue() {
-        return (V) constructDate();
-    }
-
-    @Override
-    public void setValue(V value) {
-        setValueToFields(value);
-        updateInstance();
-    }*/
-
-    // VAADIN8: gg, need to use?
-    /*protected void updateInstance() {
-        if (updatingInstance) {
-            return;
-        }
-
-        updatingInstance = true;
-        try {
-            if (getDatasource() != null && getMetaPropertyPath() != null) {
-                Date value = constructDate();
-
-                if (getDatasource().getItem() != null) {
-                    InstanceUtils.setValueEx(getDatasource().getItem(), getMetaPropertyPath().getPath(), value);
-                }
-            }
-        } finally {
-            updatingInstance = false;
-        }
-
-        Object newValue = getValue();
-        fireValueChanged(newValue);
-    }*/
 
     @Override
     public int getTabIndex() {

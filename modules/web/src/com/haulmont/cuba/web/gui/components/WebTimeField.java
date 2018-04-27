@@ -17,7 +17,6 @@
 package com.haulmont.cuba.web.gui.components;
 
 import com.haulmont.chile.core.datatypes.Datatypes;
-import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.components.DateField;
 import com.haulmont.cuba.gui.components.TimeField;
@@ -27,12 +26,15 @@ import com.haulmont.cuba.web.App;
 import com.haulmont.cuba.web.widgets.CubaMaskedTextField;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 
+import javax.inject.Inject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class WebTimeField extends WebV8AbstractField<CubaMaskedTextField, String, Date> implements TimeField {
+public class WebTimeField extends WebV8AbstractField<CubaMaskedTextField, String, Date>
+        implements TimeField, InitializingBean {
 
     protected boolean showSeconds;
 
@@ -40,16 +42,17 @@ public class WebTimeField extends WebV8AbstractField<CubaMaskedTextField, String
     protected String timeFormat;
     protected DateField.Resolution resolution;
 
-    public WebTimeField() {
-        UserSessionSource uss = AppBeans.get(UserSessionSource.NAME);
+    @Inject
+    protected UserSessionSource userSessionSource;
 
-        timeFormat = Datatypes.getFormatStringsNN(uss.getLocale()).getTimeFormat();
+    public WebTimeField() {
         resolution = DateField.Resolution.MIN;
 
         component = new CubaMaskedTextField();
         component.setMaskedMode(true);
         component.setTimeMask(true);
-        setShowSeconds(timeFormat.contains("ss"));
+
+        attachValueChangeListener(component);
 
         // vaadin8
 //        component.setInvalidAllowed(false);
@@ -60,7 +63,13 @@ public class WebTimeField extends WebV8AbstractField<CubaMaskedTextField, String
                 throw new com.vaadin.v7.data.Validator.InvalidValueException("Unable to parse value: " + value);
             }
         });*/
-        attachValueChangeListener(component);
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        timeFormat = Datatypes.getFormatStringsNN(userSessionSource.getLocale()).getTimeFormat();
+        setShowSeconds(timeFormat.contains("ss"));
+
     }
 
     public boolean isAmPmUsed() {

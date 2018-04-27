@@ -17,6 +17,7 @@
 package com.haulmont.cuba.security.app;
 
 import com.haulmont.cuba.security.global.LoginException;
+import com.haulmont.cuba.security.global.TrustedClientOnly;
 import com.haulmont.cuba.security.global.UserSession;
 
 import javax.annotation.Nonnull;
@@ -26,6 +27,7 @@ import java.util.UUID;
 /**
  * Service that provides additional API for trusted clients.
  */
+@TrustedClientOnly
 public interface TrustedClientService {
     String NAME = "cuba_TrustedClientService";
 

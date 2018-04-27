@@ -25,9 +25,13 @@ import com.haulmont.cuba.core.global.validation.MethodResultValidationException;
 import com.haulmont.cuba.core.global.validation.ServiceMethodConstraintViolation;
 import com.haulmont.cuba.core.global.validation.groups.ServiceParametersChecks;
 import com.haulmont.cuba.core.global.validation.groups.ServiceResultChecks;
+import com.haulmont.cuba.core.sys.remoting.RemoteClientInfo;
 import com.haulmont.cuba.security.app.UserSessionsAPI;
 import com.haulmont.cuba.security.global.NoUserSessionException;
+import com.haulmont.cuba.security.global.TrustedAccessRequiredException;
+import com.haulmont.cuba.security.global.TrustedClientOnly;
 import com.haulmont.cuba.security.global.UserSession;
+import com.haulmont.cuba.security.sys.TrustedLoginHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
@@ -59,6 +63,10 @@ public class ServiceInterceptor {
 
     private MiddlewareStatisticsAccumulator statisticsAccumulator;
 
+    private TrustedLoginHandler trustedLoginHandler;
+
+    private boolean checkServiceCallFromTrustedIp = false;
+
     boolean logInternalServiceInvocation;
 
     public void setUserSessions(UserSessionsAPI userSessions) {
@@ -78,7 +86,14 @@ public class ServiceInterceptor {
     }
 
     public void setConfiguration(Configuration configuration) {
-        logInternalServiceInvocation = configuration.getConfig(ServerConfig.class).getLogInternalServiceInvocation();
+        ServerConfig serverConfig = configuration.getConfig(ServerConfig.class);
+
+        this.logInternalServiceInvocation = serverConfig.getLogInternalServiceInvocation();
+        this.checkServiceCallFromTrustedIp = serverConfig.getCheckServiceCallFromTrustedIp();
+    }
+
+    public void setTrustedLoginHandler(TrustedLoginHandler trustedLoginHandler) {
+        this.trustedLoginHandler = trustedLoginHandler;
     }
 
     private Object aroundInvoke(ProceedingJoinPoint ctx) throws Throwable {
@@ -101,6 +116,11 @@ public class ServiceInterceptor {
             } else {
                 statisticsAccumulator.incMiddlewareRequestsCount();
                 try {
+                    // check if remote access from trusted environment
+                    if (checkServiceCallFromTrustedIp) {
+                        checkTrustedAccess(ctx);
+                    }
+
                     // Using UserSessionsAPI directly to make sure the session's "last used" timestamp is propagated to the cluster
                     UserSession userSession = userSessions.getAndRefresh(securityContext.getSessionId(), true);
                     if (userSession == null) {
@@ -131,6 +151,32 @@ public class ServiceInterceptor {
             }
         } finally {
             securityContext.decServiceInvocation();
+        }
+    }
+
+    /**
+     * Check if the client is permitted to call the service method.
+     *
+     * @param ctx context
+     */
+    protected void checkTrustedAccess(ProceedingJoinPoint ctx) {
+        RemoteClientInfo remoteClientInfo = RemoteClientInfo.get();
+
+        if (remoteClientInfo != null
+                && ctx instanceof MethodInvocationProceedingJoinPoint) {
+            MethodSignature signature = (MethodSignature) ctx.getSignature();
+
+            if (signature.getMethod().getAnnotation(TrustedClientOnly.class) != null
+                    || signature.getClass().getAnnotation(TrustedClientOnly.class) != null) {
+
+                if (!trustedLoginHandler.checkAddress(remoteClientInfo.getAddress())) {
+                    log.warn("Client is not allowed to call '{}' since IP '{}' is not trusted",
+                            ctx.getSignature().toShortString(),
+                            remoteClientInfo.getAddress());
+
+                    throw new TrustedAccessRequiredException();
+                }
+            }
         }
     }
 

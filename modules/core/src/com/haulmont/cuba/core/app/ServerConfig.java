@@ -22,6 +22,7 @@ import com.haulmont.cuba.core.config.Source;
 import com.haulmont.cuba.core.config.SourceType;
 import com.haulmont.cuba.core.config.defaults.*;
 import com.haulmont.cuba.security.app.UserSessionsAPI;
+import com.haulmont.cuba.security.global.TrustedClientOnly;
 
 /**
  * Configuration parameters interface used by the CORE layer.
@@ -82,6 +83,7 @@ public interface ServerConfig extends Config {
     @Property("cuba.userSessionExpirationTimeoutSec")
     @DefaultInt(1800)
     int getUserSessionExpirationTimeoutSec();
+
     void setUserSessionExpirationTimeoutSec(int timeout);
 
     /**
@@ -92,6 +94,7 @@ public interface ServerConfig extends Config {
     @Property("cuba.userSessionSendTimeoutSec")
     @DefaultInt(10)
     int getUserSessionSendTimeoutSec();
+
     void setUserSessionSendTimeoutSec(int timeout);
 
     /**
@@ -125,7 +128,7 @@ public interface ServerConfig extends Config {
     /**
      * An immutable file storage throws exception on attempt to write an existing file.
      *
-     * @return  whether file storage is immutable.
+     * @return whether file storage is immutable.
      */
     @Property("cuba.immutableFileStorage")
     @DefaultBoolean(true)
@@ -138,6 +141,7 @@ public interface ServerConfig extends Config {
     @Source(type = SourceType.DATABASE)
     @DefaultBoolean(false)
     boolean getSchedulingActive();
+
     void setSchedulingActive(boolean value);
 
     /**
@@ -147,6 +151,7 @@ public interface ServerConfig extends Config {
     @Source(type = SourceType.DATABASE)
     @DefaultLong(1000)
     long getSchedulingInterval();
+
     void setSchedulingInterval(long value);
 
     /**
@@ -155,6 +160,7 @@ public interface ServerConfig extends Config {
     @Property("cuba.schedulingThreadPoolSize")
     @DefaultInt(10)
     int getSchedulingThreadPoolSize();
+
     void setSchedulingThreadPoolSize(int value);
 
     /**
@@ -165,6 +171,7 @@ public interface ServerConfig extends Config {
     @Source(type = SourceType.DATABASE)
     @DefaultBoolean(false)
     boolean getInMemoryDistinct();
+
     void setInMemoryDistinct(boolean value);
 
     /**
@@ -174,6 +181,7 @@ public interface ServerConfig extends Config {
     @Source(type = SourceType.DATABASE)
     @DefaultInt(0)
     int getDefaultQueryTimeoutSec();
+
     void setDefaultQueryTimeoutSec(int timeout);
 
     /**
@@ -301,4 +309,12 @@ public interface ServerConfig extends Config {
     @Property("cuba.enableDeleteStatementInSoftDeleteMode")
     @DefaultBoolean(false)
     boolean getEnableDeleteStatementInSoftDeleteMode();
+
+    /**
+     * @return if true, service and service methods annotated with {@link TrustedClientOnly} may be called only if
+     * client is trusted, i.e. its IP is added to {@link #getTrustedClientPermittedIpList()}.
+     */
+    @Property("cuba.checkServiceCallFromTrustedIp")
+    @DefaultBoolean(false)
+    boolean getCheckServiceCallFromTrustedIp();
 }

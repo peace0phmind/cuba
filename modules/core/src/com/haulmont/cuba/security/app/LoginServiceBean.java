@@ -24,6 +24,7 @@ import com.haulmont.cuba.security.entity.User;
 import com.haulmont.cuba.security.global.LoginException;
 import com.haulmont.cuba.security.global.SessionParams;
 import com.haulmont.cuba.security.global.UserSession;
+import com.haulmont.cuba.security.sys.TrustedLoginHandler;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,9 @@ public class LoginServiceBean implements LoginService {
 
     @Inject
     protected GlobalConfig globalConfig;
+
+    @Inject
+    protected TrustedLoginHandler trustedLoginHandler;
 
     @Override
     public UserSession login(String login, String password, Locale locale) throws LoginException {
@@ -155,11 +159,15 @@ public class LoginServiceBean implements LoginService {
 
     @Override
     public int loginAttemptsLeft(String login, String ipAddress) {
+        // todo check IP is trusted here
+
         return bruteForceProtectionAPI.loginAttemptsLeft(login, ipAddress);
     }
 
     @Override
     public int registerUnsuccessfulLogin(String login, String ipAddress) {
+        // todo check IP is trusted here
+
         return bruteForceProtectionAPI.registerUnsuccessfulLogin(login, ipAddress);
     }
 
@@ -184,6 +192,14 @@ public class LoginServiceBean implements LoginService {
         }
         if (!globalConfig.getLocaleSelectVisible()) {
             credentials.setOverrideLocale(false);
+        }
+
+        RemoteClientInfo remoteClientInfo = RemoteClientInfo.get();
+        if (remoteClientInfo != null) {
+            String address = remoteClientInfo.getAddress();
+            if (!trustedLoginHandler.checkAddress(address)) {
+                credentials.setIpAddress(address);
+            }
         }
     }
 }

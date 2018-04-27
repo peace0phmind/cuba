@@ -19,6 +19,7 @@ package com.haulmont.cuba.security.idp;
 import com.haulmont.cuba.security.auth.Credentials;
 import com.haulmont.cuba.security.global.IdpSession;
 import com.haulmont.cuba.security.global.LoginException;
+import com.haulmont.cuba.security.global.TrustedClientOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,6 +30,7 @@ import java.util.Map;
 /**
  * Provides session storage for IDP web service.
  */
+@TrustedClientOnly
 public interface IdpService {
     String NAME = "cuba_IdpService";
 

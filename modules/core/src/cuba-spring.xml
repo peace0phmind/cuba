@@ -85,6 +85,7 @@
         <property name="beanValidation" ref="cuba_BeanValidation"/>
         <property name="statisticsAccumulator" ref="cuba_MiddlewareStatisticsAccumulator"/>
         <property name="configuration" ref="cuba_Configuration"/>
+        <property name="trustedLoginHandler" ref="cuba_TrustedLoginHandler"/>
     </bean>
 
     <bean id="authenticationInterceptor" class="com.haulmont.cuba.security.sys.AuthenticationInterceptor">

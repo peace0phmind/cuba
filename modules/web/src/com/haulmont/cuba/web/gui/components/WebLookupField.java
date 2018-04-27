@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.vaadin.event.ShortcutAction.KeyCode;
 import static com.vaadin.event.ShortcutAction.ModifierKey;
@@ -530,17 +529,9 @@ public class WebLookupField extends WebAbstractOptionsField<CubaComboBox> implem
         this.filterPredicate = filterPredicate;
 
         if (filterPredicate != null) {
-            component.setSearchExecutor((objects, s) -> {
-                if (objects == null || objects.isEmpty()) {
-                    return Collections.emptyList();
-                }
-
-                return objects.stream()
-                        .filter(item -> filterPredicate.test(component.getItemCaption(item), s))
-                        .collect(Collectors.toList());
-            });
+            component.setFilterPredicate(filterPredicate::test);
         } else {
-            component.setSearchExecutor(null);
+            component.setFilterPredicate(null);
         }
     }
 

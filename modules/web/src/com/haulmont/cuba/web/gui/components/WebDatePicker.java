@@ -21,10 +21,10 @@ import com.haulmont.bali.util.Preconditions;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.global.Messages;
-import com.haulmont.cuba.core.global.TimeSource;
-import com.haulmont.cuba.core.global.UserSessionSource;
 import com.haulmont.cuba.gui.components.DatePicker;
 import com.haulmont.cuba.gui.components.data.ConversionException;
+import com.haulmont.cuba.gui.components.data.DataAwareComponentsTools;
+import com.haulmont.cuba.gui.components.data.EntityValueSource;
 import com.haulmont.cuba.gui.components.data.ValueSource;
 import com.haulmont.cuba.gui.components.data.value.DatasourceValueSource;
 import com.haulmont.cuba.web.widgets.CubaDatePicker;
@@ -32,11 +32,7 @@ import com.vaadin.shared.ui.datefield.DateResolution;
 import com.vaadin.ui.InlineDateField;
 import org.springframework.beans.factory.InitializingBean;
 
-import javax.inject.Inject;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.Past;
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.Date;
 
 public class WebDatePicker<V extends Date> extends WebV8AbstractField<InlineDateField, LocalDate, V>
@@ -44,25 +40,15 @@ public class WebDatePicker<V extends Date> extends WebV8AbstractField<InlineDate
 
     protected Resolution resolution = Resolution.DAY;
 
-    // VAADIN8: gg, remove?
-//    protected boolean updatingInstance;
-
-    @Inject
-    protected Messages messages;
-    @Inject
-    protected UserSessionSource sessionSource;
-    @Inject
-    protected TimeSource timeSource;
-
     public WebDatePicker() {
         this.component = new CubaDatePicker();
+
         attachValueChangeListener(component);
-        // VAADIN8: gg,
-//        component.setInvalidCommitted(true);
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        Messages messages = applicationContext.getBean(Messages.class);
         component.setDateOutOfRangeMessage(messages.getMainMessage("datePicker.dateOutOfRangeMessage"));
     }
 
@@ -225,37 +211,14 @@ public class WebDatePicker<V extends Date> extends WebV8AbstractField<InlineDate
     }*/
 
     @Override
-    protected void valueBindingActivated(ValueSource<V> valueSource) {
-        if (valueSource instanceof DatasourceValueSource) {
-            MetaPropertyPath metaPropertyPath = ((DatasourceValueSource) valueSource).getMetaPropertyPath();
-            setDateRangeByProperty(metaPropertyPath.getMetaProperty());
-        }
-    }
+    protected void valueBindingConnected(ValueSource<V> valueSource) {
+        super.valueBindingConnected(valueSource);
 
-    protected void setDateRangeByProperty(MetaProperty metaProperty) {
-        if (metaProperty.getAnnotations().get(Past.class.getName()) != null) {
-            Date currentTimestamp = timeSource.currentTimestamp();
+        if (valueSource instanceof EntityValueSource) {
+            DataAwareComponentsTools dataAwareComponentsTools = applicationContext.getBean(DataAwareComponentsTools.class);
+            EntityValueSource entityValueSource = (EntityValueSource) valueSource;
 
-            Calendar calendar = Calendar.getInstance(sessionSource.getLocale());
-            calendar.setTime(currentTimestamp);
-            calendar.set(Calendar.HOUR_OF_DAY, 23);
-            calendar.set(Calendar.MINUTE, 59);
-            calendar.set(Calendar.SECOND, 59);
-            calendar.set(Calendar.MILLISECOND, 999);
-
-            setRangeEnd(calendar.getTime());
-        } else if (metaProperty.getAnnotations().get(Future.class.getName()) != null) {
-            Date currentTimestamp = timeSource.currentTimestamp();
-
-            Calendar calendar = Calendar.getInstance(sessionSource.getLocale());
-            calendar.setTime(currentTimestamp);
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
-            calendar.add(Calendar.DATE, 1);
-
-            setRangeStart(calendar.getTime());
+            dataAwareComponentsTools.setupDateRange(this, entityValueSource);
         }
     }
 
@@ -267,10 +230,16 @@ public class WebDatePicker<V extends Date> extends WebV8AbstractField<InlineDate
         }
 
         Date datePickerDate = DateTimeUtils.asDate(componentRawValue);
-        if (getMetaProperty() != null) {
-            Class javaClass = getMetaProperty().getRange().asDatatype().getJavaClass();
-            if (javaClass.equals(java.sql.Date.class)) {
-                return (V) new java.sql.Date(datePickerDate.getTime());
+
+        ValueSource<V> valueSource = getValueSource();
+        if (valueSource instanceof EntityValueSource) {
+            MetaPropertyPath metaPropertyPath = ((DatasourceValueSource) valueSource).getMetaPropertyPath();
+            MetaProperty metaProperty = metaPropertyPath.getMetaProperty();
+            if (metaProperty != null) {
+                Class javaClass = metaProperty.getRange().asDatatype().getJavaClass();
+                if (javaClass.equals(java.sql.Date.class)) {
+                    return (V) new java.sql.Date(datePickerDate.getTime());
+                }
             }
         }
 

@@ -28,7 +28,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import javax.inject.Inject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,9 +40,6 @@ public class WebTimeField extends WebV8AbstractField<CubaMaskedTextField, String
     protected String placeholder;
     protected String timeFormat;
     protected DateField.Resolution resolution;
-
-    @Inject
-    protected UserSessionSource userSessionSource;
 
     public WebTimeField() {
         resolution = DateField.Resolution.MIN;
@@ -67,6 +63,7 @@ public class WebTimeField extends WebV8AbstractField<CubaMaskedTextField, String
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        UserSessionSource userSessionSource = applicationContext.getBean(UserSessionSource.class);
         timeFormat = Datatypes.getFormatStringsNN(userSessionSource.getLocale()).getTimeFormat();
         setShowSeconds(timeFormat.contains("ss"));
 

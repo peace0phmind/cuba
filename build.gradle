@@ -87,7 +87,7 @@ def webModuleThemesModule = project(':cuba-web-themes')
 def coreTestsModule = project(':cuba-core-tests')
 def clientTestsModule = project(':cuba-client-tests')
 
-configure([sharedLibModule, globalModule, coreModule, clientModule, guiModule,
+configure([sharedLibModule, globalModule, coreModule, coreTestsModule, clientModule, guiModule,
            webModule, desktopModule, portalModule, restApiModule, idpModule, uberJarModule, frontModule]) {
     apply(plugin: 'java')
     apply(plugin: 'groovy')
@@ -336,8 +336,6 @@ configure(globalModule) {
         from new File(project.buildDir, 'release-number')
     }
 
-    task enhance(type: CubaEnhancing)
-
     task filterDummyEntities {
         ext.srcFile1 = file('src/base-persistence.xml')
         ext.srcFile2 = file('src/cuba-persistence.xml')
@@ -414,23 +412,6 @@ configure(coreModule) {
 
         jdbc(bom['org.postgresql:postgresql'])
         jdbc(bom['org.hsqldb:hsqldb'])
-
-        testCompile(bom['org.apache.commons:commons-dbcp2'])
-        testRuntime(bom['javax.servlet:javax.servlet-api'])
-        testRuntime(bom['org.hsqldb:hsqldb'])
-    	testRuntime(bom['org.postgresql:postgresql'])
-    }
-
-    task enhanceTestModel(type: CubaTestEnhancing)
-
-    test {
-        scanForTestClasses = false
-        includes = ['**/*Test.class']
-        jvmArgs '-XX:-UseSplitVerifier'
-
-        systemProperties = [
-                'logback.configurationFile': System.getProperty('logback.configurationFile')
-        ]
     }
 
     task testEntityCache(type: Test) {
@@ -475,35 +456,35 @@ configure(coreModule) {
         dbUser = 'sa'
         dbPassword = ''
     }
-
-    task createTestDb(dependsOn: assembleDbScripts, description: 'Creates local HSQL database', type: CubaDbCreation) {
-        dbms = 'hsql'
-        host = "localhost:$hsqlPort"
-        dbName = hsqlDbName
-        dbUser = 'sa'
-        dbPassword = ''
-        auxiliaryScript = file('test/com/haulmont/cuba/testmodel/create-db.sql')
-    }
 }
 
 configure(coreTestsModule) {
-    apply(plugin: 'java')
-    apply(plugin: 'maven')
-    apply(plugin: 'cuba')
+    configurations {
+        dbscripts
+    }
 
-    buildDir = file('../build/core-tests')
+//    test {
+//        scanForTestClasses = false
+//        includes = ['**/*Test.class']
+//        jvmArgs '-XX:-UseSplitVerifier'
+//
+//        systemProperties = [
+//                'logback.configurationFile': System.getProperty('logback.configurationFile')
+//        ]
+//    }
 
     sourceSets {
         main {
             java {
-                srcDir '.'
-
-                include 'com/haulmont/cuba/core/CubaTestCase.java'
-                include 'com/haulmont/cuba/testsupport/*.java'
-                include '*'
+                srcDirs = ['src/']
             }
-            resources {
-                srcDir '.'
+        }
+        test {
+            java {
+                srcDir 'test'
+            }
+            groovy {
+                srcDir 'test'
             }
         }
     }
@@ -514,19 +495,44 @@ configure(coreTestsModule) {
         compile(bom['org.apache.commons:commons-dbcp2'])
         compile(bom['org.jmockit:jmockit'])
         compile(bom['junit:junit'])
+
+        testCompile(bom['org.apache.commons:commons-dbcp2'])
+        testCompile(bom['org.spockframework:spock-core']) {
+            exclude(group: 'org.codehaus.groovy', module: 'groovy-all')
+        }
+
+        testRuntime(bom['javax.servlet:javax.servlet-api'])
+        testRuntime(bom['org.hsqldb:hsqldb'])
+        testRuntime(bom['org.postgresql:postgresql'])
     }
 
-    task sourceJar(type: Jar) {
+    /*task sourceJar(type: Jar) {
         from file('.')
         include 'com/haulmont/cuba/core/CubaTestCase*.class'
         include 'com/haulmont/cuba/core/CubaTestCase*.java'
         include 'com/haulmont/cuba/testsupport/*'
         include '*'
         classifier = 'sources'
+    }*/
+
+    /*artifacts {
+        archives sourceJar
+    }*/
+
+    assembleDbScripts {
+        moduleAlias = '10-cuba'
     }
 
-    artifacts {
-        archives sourceJar
+    def hsqlDbName = 'cubadb'
+    def hsqlPort = 9111
+
+    task createTestDb(dependsOn: assembleDbScripts, description: 'Creates local HSQL database', type: CubaDbCreation) {
+        dbms = 'hsql'
+        host = "localhost:$hsqlPort"
+        dbName = hsqlDbName
+        dbUser = 'sa'
+        dbPassword = ''
+        auxiliaryScript = file('src/com/haulmont/cuba/testmodel/create-db.sql')
     }
 }
 
@@ -581,8 +587,6 @@ configure(guiModule) {
 
         testCompile(clientModule.sourceSets.test.output)
     }
-
-    task enhance(type: CubaEnhancing)
 
     test {
         scanForTestClasses = false
@@ -654,8 +658,6 @@ configure(webModule) {
         testCompile(guiModule.sourceSets.test.output)
         testRuntime(bom['javax.servlet:javax.servlet-api'])
     }
-
-    task enhance(type: CubaEnhancing)
 
     jar {
         with copySpec {

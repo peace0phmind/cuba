@@ -4,6 +4,7 @@
 /.shelf/
 /test-home/
 out
+.idea/
 *.iml
 *.ipr
 *.iws

@@ -549,19 +549,6 @@ configure(clientTestsModule) {
     apply(plugin: 'maven')
     apply(plugin: 'cuba')
 
-    buildDir = file('../build/client-tests')
-
-    sourceSets {
-        main {
-            java {
-                srcDir '.'
-            }
-            resources {
-                srcDir '.'
-            }
-        }
-    }
-
     dependencies {
         compile(clientModule)
 
@@ -585,7 +572,7 @@ configure(guiModule) {
 
         compile(bom['org.apache.poi:poi'])
 
-        testCompile(clientModule.sourceSets.test.output)
+        testCompile(clientTestsModule)
     }
 
     test {

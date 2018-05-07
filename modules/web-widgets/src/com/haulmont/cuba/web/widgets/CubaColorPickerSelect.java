@@ -16,29 +16,39 @@
 
 package com.haulmont.cuba.web.widgets;
 
-import com.vaadin.v7.ui.AbstractSelect;
-import com.vaadin.v7.ui.components.colorpicker.ColorPickerSelect;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.components.colorpicker.ColorPickerSelect;
 
 public class CubaColorPickerSelect extends ColorPickerSelect {
 
-    public CubaColorPickerSelect() {
-        range.setItemCaptionMode(AbstractSelect.ItemCaptionMode.EXPLICIT_DEFAULTS_ID);
+    @Override
+    protected Component initContent() {
+        Component component = super.initContent();
+
+        // VAADIN8: gg, there is no method
+//        range.setItemCaptionMode(AbstractSelect.ItemCaptionMode.EXPLICIT_DEFAULTS_ID);
         range.setTextInputAllowed(false);
+
+        return component;
     }
 
     public void setAllCaption(String allCaption) {
-        range.setItemCaption(ColorRangePropertyId.ALL, allCaption);
+        // VAADIN8: gg, use itemCaptionGenerator
+//        range.setItemCaption(ColorRange.ALL, allCaption);
     }
 
     public void setRedCaption(String redCaption) {
-        range.setItemCaption(ColorRangePropertyId.RED, redCaption);
+        // VAADIN8: gg, use itemCaptionGenerator
+//        range.setItemCaption(ColorRange.RED, redCaption);
     }
 
     public void setGreenCaption(String greenCaption) {
-        range.setItemCaption(ColorRangePropertyId.GREEN, greenCaption);
+        // VAADIN8: gg, use itemCaptionGenerator
+//        range.setItemCaption(ColorRange.GREEN, greenCaption);
     }
 
     public void setBlueCaption(String blueCaption) {
-        range.setItemCaption(ColorRangePropertyId.BLUE, blueCaption);
+        // VAADIN8: gg, use itemCaptionGenerator
+//        range.setItemCaption(ColorRange.BLUE, blueCaption);
     }
 }

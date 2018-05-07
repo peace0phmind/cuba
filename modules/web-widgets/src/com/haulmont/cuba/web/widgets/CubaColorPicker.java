@@ -18,8 +18,8 @@ package com.haulmont.cuba.web.widgets;
 
 import com.haulmont.cuba.web.widgets.client.colorpicker.CubaColorPickerState;
 import com.vaadin.ui.Component;
-import com.vaadin.v7.shared.ui.colorpicker.Color;
-import com.vaadin.v7.ui.ColorPicker;
+import com.vaadin.shared.ui.colorpicker.Color;
+import com.vaadin.ui.ColorPicker;
 
 public class CubaColorPicker extends ColorPicker implements Component.Focusable {
 
@@ -40,7 +40,7 @@ public class CubaColorPicker extends ColorPicker implements Component.Focusable 
     protected String valueSliderCaption;
 
     @Override
-    protected void createPopupWindow() {
+    protected void createPopupWindow(Color color) {
         window = new CubaColorPickerPopup(color);
         ((CubaColorPickerPopup) window).setConfirmButtonCaption(confirmButtonCaption);
         ((CubaColorPickerPopup) window).setCancelButtonCaption(cancelButtonCaption);
@@ -68,11 +68,11 @@ public class CubaColorPicker extends ColorPicker implements Component.Focusable 
     }
 
     @Override
-    public void setColor(Color color) {
+    public void setValue(Color color) {
         if (color == null) {
             color = new Color(0,0,0);
         }
-        super.setColor(color);
+        super.setValue(color);
     }
 
     public void setWindowCaption(String windowCaption) {
@@ -185,23 +185,6 @@ public class CubaColorPicker extends ColorPicker implements Component.Focusable 
 
     public void setValueSliderCaption(String valueSliderCaption) {
         this.valueSliderCaption = valueSliderCaption;
-    }
-
-    @Override
-    public void focus() {
-        super.focus();
-    }
-
-    @Override
-    public int getTabIndex() {
-        return getState(false).tabIndex;
-    }
-
-    @Override
-    public void setTabIndex(int tabIndex) {
-        if (getState(false).tabIndex != tabIndex) {
-            getState().tabIndex = tabIndex;
-        }
     }
 
     @Override

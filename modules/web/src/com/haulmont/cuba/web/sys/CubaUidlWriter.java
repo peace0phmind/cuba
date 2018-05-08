@@ -49,9 +49,7 @@ public class CubaUidlWriter extends UidlWriter {
     protected static final Pattern OLD_WEBJAR_IDENTIFIER = Pattern.compile("([^:]+)/.+/(.+)");
     protected static final Pattern NEW_WEBJAR_IDENTIFIER = Pattern.compile("(.+):(.+)");
 
-    protected WebJarAssetLocator webJarAssetLocator = new WebJarAssetLocator();
-
-    protected ServletContext servletContext;
+    protected final ServletContext servletContext;
 
     public CubaUidlWriter(ServletContext servletContext) {
         this.servletContext = servletContext;
@@ -107,7 +105,8 @@ public class CubaUidlWriter extends UidlWriter {
             return staticResourcePath;
         }
 
-        return webJarAssetLocator.getFullPath(webJar, resource);
+        return webJarAssetLocator.getFullPath(webJar, resource)
+                .replace(META_INF_PREFIX, VAADIN_PREFIX);
     }
 
     protected String getWebJarStaticResourcePath(String overridePath, String resource) {

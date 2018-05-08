@@ -59,6 +59,11 @@ public class CubaColorPicker extends ColorPicker implements Component.Focusable 
     }
 
     @Override
+    protected ValueChangeListener<Color> createColorValueChangeListener() {
+        return event -> setValue(event.getValue(), true);
+    }
+
+    @Override
     protected void showPopup(boolean open) {
         super.showPopup(open);
 

@@ -21,34 +21,56 @@ import com.vaadin.ui.components.colorpicker.ColorPickerSelect;
 
 public class CubaColorPickerSelect extends ColorPickerSelect {
 
+    protected String allCaption;
+    protected String redCaption;
+    protected String greenCaption;
+    protected String blueCaption;
+
     @Override
     protected Component initContent() {
         Component component = super.initContent();
 
-        // VAADIN8: gg, there is no method
-//        range.setItemCaptionMode(AbstractSelect.ItemCaptionMode.EXPLICIT_DEFAULTS_ID);
         range.setTextInputAllowed(false);
+        range.setItemCaptionGenerator(item -> {
+            switch (item) {
+                case ALL:
+                    return allCaption;
+                case RED:
+                    return redCaption;
+                case GREEN:
+                    return greenCaption;
+                case BLUE:
+                    return blueCaption;
+            }
+            return null;
+        });
 
         return component;
     }
 
     public void setAllCaption(String allCaption) {
-        // VAADIN8: gg, use itemCaptionGenerator
-//        range.setItemCaption(ColorRange.ALL, allCaption);
+        this.allCaption = allCaption;
+        updateSelectedItemCaption();
     }
 
     public void setRedCaption(String redCaption) {
-        // VAADIN8: gg, use itemCaptionGenerator
-//        range.setItemCaption(ColorRange.RED, redCaption);
+        this.redCaption = redCaption;
+        updateSelectedItemCaption();
     }
 
     public void setGreenCaption(String greenCaption) {
-        // VAADIN8: gg, use itemCaptionGenerator
-//        range.setItemCaption(ColorRange.GREEN, greenCaption);
+        this.greenCaption = greenCaption;
+        updateSelectedItemCaption();
     }
 
     public void setBlueCaption(String blueCaption) {
-        // VAADIN8: gg, use itemCaptionGenerator
-//        range.setItemCaption(ColorRange.BLUE, blueCaption);
+        this.blueCaption = blueCaption;
+        updateSelectedItemCaption();
+    }
+
+    protected void updateSelectedItemCaption() {
+        if (range != null && range.getSelectedItem().isPresent()) {
+            range.updateSelectedItemCaption();
+        }
     }
 }

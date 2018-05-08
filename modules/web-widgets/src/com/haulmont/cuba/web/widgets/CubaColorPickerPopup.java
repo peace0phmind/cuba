@@ -18,6 +18,7 @@ package com.haulmont.cuba.web.widgets;
 
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.shared.ui.colorpicker.Color;
@@ -27,6 +28,14 @@ public class CubaColorPickerPopup extends ColorPickerPopup {
 
     public CubaColorPickerPopup(Color initialColor) {
         super(initialColor);
+    }
+
+    @Override
+    protected VerticalLayout createHistoryOuterContainer(VerticalLayout innerContainer) {
+        innerContainer.setMargin(false);
+        VerticalLayout historyOuterContainer = super.createHistoryOuterContainer(innerContainer);
+        historyOuterContainer.setMargin(new MarginInfo(false, true, false, true));
+        return historyOuterContainer;
     }
 
     public void setConfirmButtonCaption(String caption) {

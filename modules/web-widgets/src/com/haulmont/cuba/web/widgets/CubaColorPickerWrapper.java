@@ -50,7 +50,6 @@ public class CubaColorPickerWrapper extends CustomField<Color> {
 
     @Override
     protected void doSetValue(Color value) {
-        // VAADIN8: gg, is it correct?
         if (!Objects.equals(field.getValue(), value)) {
             field.setValue(value);
         }
@@ -58,7 +57,6 @@ public class CubaColorPickerWrapper extends CustomField<Color> {
 
     @Override
     public Color getValue() {
-        // VAADIN8: gg, is it correct?
         return field.getValue();
     }
 

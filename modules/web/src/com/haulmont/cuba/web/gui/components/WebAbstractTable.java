@@ -82,6 +82,7 @@ import org.springframework.context.ApplicationContext;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.haulmont.bali.util.Preconditions.checkNotNullArgument;
 
@@ -98,6 +99,9 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
     protected static final String HAS_TOP_PANEL_STYLENAME = "has-top-panel";
 
     protected static final String CUSTOM_STYLE_NAME_PREFIX = "cs ";
+
+    // CAUTION: vaadin considers null as row header property id;
+    protected static final Object ROW_HEADER_PROPERTY_ID = null;
 
     // Beans
 
@@ -238,7 +242,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
     @Override
     public Table.Column<E> getColumn(String id) {
         for (Table.Column<E> column : columnsOrder) {
-            if (column.getId().toString().equals(id))
+            if (column.getStringId().equals(id))
                 return column;
         }
         return null;
@@ -402,7 +406,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
     @Override
     @Nullable
     public Printable getPrintable(Table.Column column) {
-        return getPrintable(String.valueOf(column.getId()));
+        return getPrintable(column.getStringId());
     }
 
     @Nullable
@@ -712,6 +716,9 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
         component.setValidationVisible(false);
         component.setShowBufferedSourceException(false);
 
+        // todo
+        // ((CubaEnhancedTable) component).setCustomCellValueFormatter(this::formatCellValue);
+
         component.setBeforePaintListener(() -> {
             com.vaadin.v7.ui.Table.CellStyleGenerator generator = component.getCellStyleGenerator();
             if (generator instanceof WebAbstractTable.StyleGeneratorAdapter) {
@@ -732,14 +739,14 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
             defaultRowHeaderWidth = theme.getInt("cuba.web.Table.defaultRowHeaderWidth");
         }
 
-        // CAUTION: vaadin considers null as row header property id;
-        component.setColumnWidth(null, defaultRowHeaderWidth); // todo get width from theme
+        component.setColumnWidth(ROW_HEADER_PROPERTY_ID, defaultRowHeaderWidth);
 
         contextMenuPopup.setParent(component);
         component.setContextMenuPopup(contextMenuPopup);
 
         shortcutsDelegate.setAllowEnterShortcut(false);
 
+        // todo rework
         component.addValueChangeListener(event -> {
             if (datasource == null) {
                 return;
@@ -771,6 +778,8 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
             LookupSelectionChangeEvent selectionChangeEvent = new LookupSelectionChangeEvent(this);
             getEventRouter().fireEvent(LookupSelectionChangeListener.class,
                     LookupSelectionChangeListener::lookupValueChanged, selectionChangeEvent);
+
+            // todo add SelectionChangeEvent support
         });
 
         component.addShortcutListener(
@@ -809,6 +818,11 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
         // force default sizes
         componentComposition.setHeightUndefined();
         componentComposition.setWidthUndefined();
+    }
+
+    protected String formatCellValue(Object rowId, Object colId, Property<?> property) {
+        // todo
+        return null;
     }
 
     protected WebTableFieldFactory createFieldFactory() {
@@ -1002,8 +1016,15 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
 
             // bind new datasource
             this.dataBinding = createTableDataContainer(tableDataSource); // todo pass delegate there
-
+            this.dataBinding.setProperties(
+                    columnsOrder.stream()
+                            .filter(c -> c.getBoundProperty() != null)
+                            .map(Column::getBoundProperty)
+                            .collect(Collectors.toList())
+            );
             this.component.setContainerDataSource(this.dataBinding);
+
+            // todo LETS ROLL !
         }
     }
 
@@ -1712,7 +1733,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
                         // wrap field for show required asterisk
                         if ((vComponent instanceof com.vaadin.v7.ui.Field)
                                 && (((com.vaadin.v7.ui.Field) vComponent).isRequired())) {
-                            VerticalLayout layout = new VerticalLayout();
+                            VerticalLayout layout = new VerticalLayout(); // vaadin8 replace with CssLayout
                             layout.setMargin(false);
                             layout.setSpacing(false);
                             layout.addComponent(vComponent);
@@ -2277,7 +2298,9 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
     protected String generateDefaultCellStyle(Object itemId, Object propertyId, MetaPropertyPath propertyPath) {
         String style = null;
 
-        Column column = getColumn(propertyId.toString());
+        String stringPropertyId = propertyId.toString();
+
+        Column column = getColumn(stringPropertyId);
         if (column != null) {
             final String isLink = column.getXmlDescriptor() == null ?
                     null : column.getXmlDescriptor().attributeValue("link");
@@ -2291,10 +2314,10 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
                     style = "c-table-cell-link";
                 } else if (column.getMaxTextLength() != null) {
                     Entity item = getDatasource().getItemNN(itemId);
-                    Object value = item.getValueEx(propertyId.toString());
+                    Object value = item.getValueEx(stringPropertyId);
                     String stringValue;
                     if (value instanceof String) {
-                        stringValue = item.getValueEx(propertyId.toString());
+                        stringValue = item.getValueEx(stringPropertyId);
                     } else {
                         if (DynamicAttributesUtils.isDynamicAttribute(propertyPath.getMetaProperty())) {
                             stringValue = dynamicAttributesTools.getDynamicAttributeValueAsString(propertyPath.getMetaProperty(), value);
@@ -2316,10 +2339,11 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
             }
         }
 
-        if (propertyPath.getRangeJavaClass() == Boolean.class) {
-            Entity item = datasource.getItem(itemId);
+        if (propertyPath.getRangeJavaClass() == Boolean.class
+                && dataBinding != null) {
+            Entity item = dataBinding.getTableDataSource().getItem(itemId);
             if (item != null) {
-                Boolean value = item.getValueEx(propertyId.toString());
+                Boolean value = item.getValueEx(stringPropertyId);
                 if (BooleanUtils.isTrue(value)) {
                     style = "boolean-cell boolean-cell-true";
                 } else {
@@ -2429,6 +2453,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
             }
         }
 
+        // todo remove
         @SuppressWarnings("unchecked")
         @Override
         public String getFormattedValue() {
@@ -2462,6 +2487,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
             return super.getValue();
         }
 
+        // todo make static method
         protected Object getValueExIgnoreUnfetched(Instance instance, String[] properties) {
             Object currentValue = null;
             Instance currentInstance = instance;

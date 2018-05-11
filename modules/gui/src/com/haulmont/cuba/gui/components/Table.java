@@ -30,6 +30,7 @@ import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
@@ -337,6 +338,8 @@ public interface Table<E extends Entity>
      * );
      * }</pre>
      *
+     * todo document deprecation
+     *
      * @param item entity item
      * @return datasource containing the item
      */
@@ -540,7 +543,7 @@ public interface Table<E extends Entity>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class Column<T> implements HasXmlDescriptor, HasCaption, HasFormatter {
+    class Column<T extends Entity> implements HasXmlDescriptor, HasCaption, HasFormatter {
 
         private static final Logger log = LoggerFactory.getLogger(Table.class);
 
@@ -576,7 +579,8 @@ public interface Table<E extends Entity>
             this.caption = caption;
         }
 
-        public Column(Class<? extends Entity> entityClass, String propertyPath) {
+        // todo convert to Table instance method
+        public Column(Class<T> entityClass, String propertyPath) {
             MetaClass metaClass = AppBeans.get(Metadata.class).getClassNN(entityClass);
             MetaPropertyPath mpp = metaClass.getPropertyPath(propertyPath);
 
@@ -601,6 +605,7 @@ public interface Table<E extends Entity>
             return null;
         }
 
+        @Nonnull
         public String getStringId() {
             if (id instanceof MetaPropertyPath) {
                 return ((MetaPropertyPath) id).toPathString();

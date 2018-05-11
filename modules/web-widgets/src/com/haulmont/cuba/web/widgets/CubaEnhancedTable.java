@@ -19,6 +19,7 @@ package com.haulmont.cuba.web.widgets;
 import com.haulmont.cuba.web.widgets.data.AggregationContainer;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Layout;
+import com.vaadin.v7.data.Property;
 
 /**
  * Interface to generalize additional functionality in {@link CubaTable}, {@link CubaGroupTable} and {@link CubaTreeTable}
@@ -106,5 +107,12 @@ public interface CubaEnhancedTable extends AggregationContainer {
     enum AggregationStyle {
         TOP,
         BOTTOM
+    }
+
+    void setCustomCellValueFormatter(CellValueFormatter cellValueFormatter);
+    CellValueFormatter getCustomCellValueFormatter();
+
+    interface CellValueFormatter {
+        String getFormattedValue(Object rowId, Object colId, Property<?> property);
     }
 }

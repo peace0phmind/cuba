@@ -892,6 +892,17 @@ public class CubaTreeTable extends com.vaadin.v7.ui.TreeTable implements TreeTab
     }
 
     @Override
+    public void setCustomCellValueFormatter(CellValueFormatter cellValueFormatter) {
+        // todo
+    }
+
+    @Override
+    public CellValueFormatter getCustomCellValueFormatter() {
+        // todo
+        return null;
+    }
+
+    @Override
     public void paintContent(PaintTarget target) throws PaintException {
         if (beforePaintListener != null) {
             beforePaintListener.run();

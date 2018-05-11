@@ -69,6 +69,7 @@ public class CubaTable extends com.vaadin.v7.ui.Table implements TableContainer,
     protected Object focusColumn;
     protected Object focusItem;
     protected Runnable beforePaintListener;
+    protected CellValueFormatter customCellValueFormatter;
 
     public CubaTable() {
         //noinspection Convert2Lambda
@@ -231,7 +232,21 @@ public class CubaTable extends com.vaadin.v7.ui.Table implements TableContainer,
     }
 
     @Override
+    public CellValueFormatter getCustomCellValueFormatter() {
+        return customCellValueFormatter;
+    }
+
+    @Override
+    public void setCustomCellValueFormatter(CellValueFormatter customCellValueFormatter) {
+        this.customCellValueFormatter = customCellValueFormatter;
+    }
+
+    @Override
     protected String formatPropertyValue(Object rowId, Object colId, Property<?> property) {
+        if (this.customCellValueFormatter != null) {
+            return customCellValueFormatter.getFormattedValue(rowId, colId, property);
+        }
+
         if (property instanceof PropertyValueStringify) {
             return ((PropertyValueStringify) property).getFormattedValue();
         }

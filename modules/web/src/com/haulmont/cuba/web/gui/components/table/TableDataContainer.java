@@ -80,14 +80,14 @@ public class TableDataContainer<I> implements Container, ItemSetChangeNotifier {
     @Override
     public Item getItem(Object itemId) {
         Object dataItem = tableDataSource.getItem(itemId);
-        return dataItem == null ? null : getItemWrapper(dataItem);
+        return dataItem == null ? null : getItemWrapper(dataItem, itemId);
     }
 
-    protected Item getItemWrapper(Object item) {
-        TableItemWrapper wrapper = itemsCache.get(item);
+    protected Item getItemWrapper(Object dataItem, Object itemId) {
+        TableItemWrapper wrapper = itemsCache.get(dataItem);
         if (wrapper == null) {
-            wrapper = getItemWrapperNonCached(item);
-            itemsCache.put(item, wrapper);
+            wrapper = getItemWrapperNonCached(dataItem, itemId);
+            itemsCache.put(dataItem, wrapper);
         }
 
         return wrapper;
@@ -102,14 +102,14 @@ public class TableDataContainer<I> implements Container, ItemSetChangeNotifier {
     }
 
     protected void returnItemWrapper(TableItemWrapper tableItemWrapper) {
-        tableItemWrapper.setItem(null);
+        tableItemWrapper.setItemId(null);
         tableItemWrapper.getPropertyWrappers().clear();
         wrappersPool.add(tableItemWrapper);
     }
 
-    protected TableItemWrapper getItemWrapperNonCached(Object item) {
+    protected TableItemWrapper getItemWrapperNonCached(@SuppressWarnings("unused") Object item, Object itemId) {
         TableItemWrapper itemWrapper = borrowItemWrapper();
-        itemWrapper.setItem(item);
+        itemWrapper.setItemId(itemId);
         for (Object property : properties) {
             itemWrapper.getPropertyWrappers().put(property,
                     new TableItemPropertyWrapper(itemWrapper, property));
@@ -142,6 +142,10 @@ public class TableDataContainer<I> implements Container, ItemSetChangeNotifier {
 
     @Override
     public Collection<?> getItemIds() {
+        if (tableDataSource.getState() == BindingState.INACTIVE) {
+            return Collections.emptyList();
+        }
+
         return tableDataSource.getItemIds();
     }
 
@@ -158,6 +162,10 @@ public class TableDataContainer<I> implements Container, ItemSetChangeNotifier {
 
     @Override
     public int size() {
+        if (tableDataSource.getState() == BindingState.INACTIVE) {
+            return 0;
+        }
+
         return tableDataSource.size();
     }
 

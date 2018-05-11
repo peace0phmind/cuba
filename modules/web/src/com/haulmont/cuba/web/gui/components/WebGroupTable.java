@@ -136,6 +136,7 @@ public class WebGroupTable<E extends Entity> extends WebAbstractTable<CubaGroupT
         return new StyleGeneratorAdapter(){
             @Override
             public String getStyle(com.vaadin.v7.ui.Table source, Object itemId, Object propertyId) {
+                // todo move to getGeneratedCellStyle, get rid of inheritance
                 if (!component.getGroupProperties().contains(propertyId)) {
                     return super.getStyle(source, itemId, propertyId);
                 }
@@ -163,10 +164,9 @@ public class WebGroupTable<E extends Entity> extends WebAbstractTable<CubaGroupT
 
         groupPropertiesElement = element.addElement("groupProperties");
 
-        final Collection<?> groupProperties = component.getGroupProperties();
-        for (Object groupProperty : groupProperties) {
+        for (Object groupProperty : component.getGroupProperties()) {
             if (getNotCollapsedColumns().contains(getColumn(groupProperty.toString()))) {
-                final Element groupPropertyElement = groupPropertiesElement.addElement("property");
+                Element groupPropertyElement = groupPropertiesElement.addElement("property");
                 groupPropertyElement.addAttribute("id", groupProperty.toString());
             }
         }
@@ -178,11 +178,11 @@ public class WebGroupTable<E extends Entity> extends WebAbstractTable<CubaGroupT
     public void applyColumnSettings(Element element) {
         super.applyColumnSettings(element);
 
-        final Element groupPropertiesElement = element.element("groupProperties");
+        Element groupPropertiesElement = element.element("groupProperties");
         if (groupPropertiesElement != null) {
-            final List elements = groupPropertiesElement.elements("property");
-            final List<MetaPropertyPath> properties = new ArrayList<>(elements.size());
-            for (final Object o : elements) {
+            List elements = groupPropertiesElement.elements("property");
+            List<MetaPropertyPath> properties = new ArrayList<>(elements.size());
+            for (Object o : elements) {
                 String id = ((Element) o).attributeValue("id");
                 final MetaPropertyPath property = DynamicAttributesUtils.isDynamicAttribute(id)
                         ? DynamicAttributesUtils.getMetaPropertyPath(datasource.getMetaClass(), id)
@@ -211,8 +211,8 @@ public class WebGroupTable<E extends Entity> extends WebAbstractTable<CubaGroupT
         if (context instanceof CubaGroupTable.GroupAggregationContext) {
             CubaGroupTable.GroupAggregationContext groupContext = (CubaGroupTable.GroupAggregationContext) context;
 
-            for (final Map.Entry<Object, Object> entry : results.entrySet()) {
-                final Table.Column column = columns.get(entry.getKey());
+            for (Map.Entry<Object, Object> entry : results.entrySet()) {
+                Table.Column column = columns.get(entry.getKey());
                 GroupAggregationCells cells;
                 if ((cells = groupAggregationCells.get(column)) != null) {
                     String value = cells.getValue(groupContext.getGroupId());
@@ -432,19 +432,19 @@ public class WebGroupTable<E extends Entity> extends WebAbstractTable<CubaGroupT
             }
 
             if (groupStyleProviders != null) {
-                String joinedStyle = null;
+                StringBuilder joinedStyle = null;
                 for (GroupStyleProvider groupStyleProvider : groupStyleProviders) {
                     String styleName = groupStyleProvider.getStyleName((GroupInfo) itemId);
                     if (styleName != null) {
                         if (joinedStyle == null) {
-                            joinedStyle = styleName;
+                            joinedStyle = new StringBuilder(styleName);
                         } else {
-                            joinedStyle += " " + styleName;
+                            joinedStyle.append(" ").append(styleName);
                         }
                     }
                 }
 
-                return joinedStyle;
+                return joinedStyle != null ? joinedStyle.toString() : null;
             }
         } else {
             return super.getGeneratedCellStyle(itemId, propertyId);
@@ -547,14 +547,14 @@ public class WebGroupTable<E extends Entity> extends WebAbstractTable<CubaGroupT
         }
 
         protected void fillGroupAggregationCells(Map<Table.Column, GroupAggregationCells> cells) {
-            final Collection roots = rootGroups();
-            for (final Object rootGroup : roots) {
+            Collection roots = rootGroups();
+            for (Object rootGroup : roots) {
                 __fillGroupAggregationCells(rootGroup, cells);
             }
         }
 
         protected void __fillGroupAggregationCells(Object groupId, Map<Table.Column, GroupAggregationCells> cells) {
-            final Set<Table.Column> aggregatableColumns = aggregationCells.keySet();
+            Set<Table.Column> aggregatableColumns = aggregationCells.keySet();
 
             for (final Column column : aggregatableColumns) {
                 if (!columns.get(getGroupProperty(groupId)).equals(column)) {
@@ -568,7 +568,7 @@ public class WebGroupTable<E extends Entity> extends WebAbstractTable<CubaGroupT
             }
 
             if (hasChildren(groupId)) {
-                final Collection children = getChildren(groupId);
+                Collection children = getChildren(groupId);
                 for (final Object child : children) {
                     __fillGroupAggregationCells(child, cells);
                 }
@@ -824,9 +824,9 @@ public class WebGroupTable<E extends Entity> extends WebAbstractTable<CubaGroupT
 
         protected LinkedList getCachedItemIds() {
             if (cachedItemIds == null) {
-                final LinkedList<Object> result = new LinkedList<>();
+                LinkedList<Object> result = new LinkedList<>();
                 //noinspection unchecked
-                final List<GroupInfo> roots = ((GroupDatasource) datasource).rootGroups();
+                List<GroupInfo> roots = ((GroupDatasource) datasource).rootGroups();
                 for (final GroupInfo root : roots) {
                     result.add(root);
                     collectItemIds(root, result);
@@ -845,7 +845,7 @@ public class WebGroupTable<E extends Entity> extends WebAbstractTable<CubaGroupT
             if (expanded.contains(groupId)) {
                 if (((GroupDatasource) datasource).hasChildren(groupId)) {
                     @SuppressWarnings("unchecked")
-                    final List<GroupInfo> children = ((GroupDatasource) datasource).getChildren(groupId);
+                    List<GroupInfo> children = ((GroupDatasource) datasource).getChildren(groupId);
                     for (final GroupInfo child : children) {
                         itemIds.add(child);
                         collectItemIds(child, itemIds);
@@ -936,8 +936,8 @@ public class WebGroupTable<E extends Entity> extends WebAbstractTable<CubaGroupT
             if (value == null) {
                 return "";
             }
-            final MetaPropertyPath propertyPath = ((GroupInfo<MetaPropertyPath>) groupId).getProperty();
-            final Table.Column column = columns.get(propertyPath);
+            MetaPropertyPath propertyPath = ((GroupInfo<MetaPropertyPath>) groupId).getProperty();
+            Table.Column column = columns.get(propertyPath);
             if (column != null && column.getXmlDescriptor() != null) {
                 String captionProperty = column.getXmlDescriptor().attributeValue("captionProperty");
                 if (column.getFormatter() != null) {
@@ -994,7 +994,7 @@ public class WebGroupTable<E extends Entity> extends WebAbstractTable<CubaGroupT
                     GroupDatasource groupDs = ((GroupDatasource) datasource);
                     @SuppressWarnings("unchecked")
                     Collection<GroupInfo> roots = groupDs.rootGroups();
-                    for (final GroupInfo root : roots) {
+                    for (GroupInfo root : roots) {
                         component.aggregate(new CubaGroupTable.GroupAggregationContext(component, root));
                     }
                 }

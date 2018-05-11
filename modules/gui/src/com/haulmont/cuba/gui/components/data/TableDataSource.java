@@ -22,8 +22,15 @@ import java.util.Collection;
 import java.util.EventObject;
 import java.util.function.Consumer;
 
+/**
+ * todo JavaDoc
+ *
+ * @param <I>
+ */
 public interface TableDataSource<I> {
     Collection<?> getItemIds();
+
+    I getItem();
 
     I getItem(Object itemId);
 

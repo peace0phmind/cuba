@@ -23,7 +23,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.ComponentsHelper;
-import com.haulmont.cuba.gui.components.data.TableDataSource;
+import com.haulmont.cuba.gui.components.data.TableSource;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import org.dom4j.Element;
@@ -60,7 +60,7 @@ public interface Table<E extends Entity>
 
     Map<Object, Object> getAggregationResults();
 
-    void setTableDataSource(TableDataSource<E> tableDataSource);
+    void setTableDataSource(TableSource<E> tableSource);
 
     // todo convert to default method
     @Deprecated
@@ -562,7 +562,7 @@ public interface Table<E extends Entity>
         protected Integer maxTextLength;
         protected ColumnAlignment alignment;
 
-        protected Function<T, Object> valueProvider;
+        protected Function<T, Object> valueProvider; // todo
 
         protected Class type;
         protected Element element;

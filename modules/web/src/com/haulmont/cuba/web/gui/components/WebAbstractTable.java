@@ -35,7 +35,7 @@ import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.gui.ComponentsHelper;
 import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.components.Formatter;
-import com.haulmont.cuba.gui.components.data.TableDataSource;
+import com.haulmont.cuba.gui.components.data.TableSource;
 import com.haulmont.cuba.gui.components.formatters.CollectionFormatter;
 import com.haulmont.cuba.gui.components.sys.ShowInfoAction;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
@@ -1001,7 +1001,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
     }
 
     @Override
-    public void setTableDataSource(TableDataSource<E> tableDataSource) {
+    public void setTableDataSource(TableSource<E> tableSource) {
         if (this.dataBinding != null) {
             this.dataBinding.unbind();
             this.dataBinding = null;
@@ -1009,13 +1009,13 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
             this.component.setContainerDataSource(null);
         }
 
-        if (tableDataSource != null) {
+        if (tableSource != null) {
             if (this.columns.isEmpty()) {
                 // todo generated columns automatically
             }
 
             // bind new datasource
-            this.dataBinding = createTableDataContainer(tableDataSource); // todo pass delegate there
+            this.dataBinding = createTableDataContainer(tableSource); // todo pass delegate there
             this.dataBinding.setProperties(
                     columnsOrder.stream()
                             .filter(c -> c.getBoundProperty() != null)
@@ -1028,11 +1028,11 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
         }
     }
 
-    protected TableDataContainer<E> createTableDataContainer(TableDataSource<E> tableDataSource) {
-        if (tableDataSource instanceof TableDataSource.Sortable) {
-            return new SortableDataContainer<>((TableDataSource.Sortable<E>) tableDataSource);
+    protected TableDataContainer<E> createTableDataContainer(TableSource<E> tableSource) {
+        if (tableSource instanceof TableSource.Sortable) {
+            return new SortableDataContainer<>((TableSource.Sortable<E>) tableSource);
         }
-        return new TableDataContainer<>(tableDataSource);
+        return new TableDataContainer<>(tableSource);
     }
 
     @Override
@@ -2341,7 +2341,7 @@ public abstract class WebAbstractTable<T extends com.vaadin.v7.ui.Table & CubaEn
 
         if (propertyPath.getRangeJavaClass() == Boolean.class
                 && dataBinding != null) {
-            Entity item = dataBinding.getTableDataSource().getItem(itemId);
+            Entity item = dataBinding.getTableSource().getItem(itemId);
             if (item != null) {
                 Boolean value = item.getValueEx(stringPropertyId);
                 if (BooleanUtils.isTrue(value)) {

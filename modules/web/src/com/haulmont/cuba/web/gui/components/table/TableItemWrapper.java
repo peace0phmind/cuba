@@ -67,15 +67,15 @@ public class TableItemWrapper implements Item {
     }
 
     public Class getPropertyType(Object propertyId) {
-        return tableDataContainer.getTableDataSource().getType(propertyId);
+        return tableDataContainer.getTableSource().getType(propertyId);
     }
 
     public Object getPropertyValue(Object propertyId) {
-        return tableDataContainer.getTableDataSource().getItemValue(itemId, propertyId);
+        return tableDataContainer.getTableSource().getItemValue(itemId, propertyId);
     }
 
     public void setPropertyValue(Object propertyId, Object newValue) {
-        tableDataContainer.getTableDataSource().setItemValue(itemId, propertyId, newValue);
+        tableDataContainer.getTableSource().setItemValue(itemId, propertyId, newValue);
     }
 
     public void addValueChangeListener(Property.ValueChangeListener propertyValueChangeListener) {

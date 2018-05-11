@@ -21,7 +21,7 @@ import com.haulmont.bali.events.Subscription;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.components.data.BindingState;
-import com.haulmont.cuba.gui.components.data.TableDataSource;
+import com.haulmont.cuba.gui.components.data.TableSource;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.impl.CollectionDsHelper;
@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unchecked")
-public class CollectionDatasourceTableAdapter<E extends Entity<K>, K> implements TableDataSource<E> {
+public class CollectionDatasourceTableAdapter<E extends Entity<K>, K> implements TableSource<E> {
 
     protected CollectionDatasource datasource;
     protected EventPublisher events = new EventPublisher();

@@ -19,7 +19,7 @@ package com.haulmont.cuba.gui.components.data.table;
 import com.google.common.base.Preconditions;
 import com.haulmont.chile.core.model.MetaPropertyPath;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.gui.components.data.TableDataSource;
+import com.haulmont.cuba.gui.components.data.TableSource;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.CollectionDatasource.Sortable.Order;
 import com.haulmont.cuba.gui.data.CollectionDatasource.Sortable.SortInfo;
@@ -27,7 +27,7 @@ import com.haulmont.cuba.gui.data.CollectionDatasource.Sortable.SortInfo;
 @SuppressWarnings("unchecked")
 public class SortableCollectionDatasourceTableAdapter<E extends Entity<K>, K>
         extends CollectionDatasourceTableAdapter<E, K>
-        implements TableDataSource.Sortable<E> {
+        implements TableSource.Sortable<E> {
 
     public SortableCollectionDatasourceTableAdapter(CollectionDatasource.Sortable<E, K> datasource) {
         super(datasource);
